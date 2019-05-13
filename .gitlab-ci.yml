@@ -1,0 +1,39 @@
+image: tmaier/docker-compose:latest
+
+stages:
+  - deploy
+
+variables:
+  URL_NAME: spotify
+  PROJECT_NAME: spotify_app
+  BASE_URL: marroquin.dev
+  USER_EMAIL: luis@marroquin.dev
+
+deploy_production:
+  stage: deploy
+  script:
+    - echo 'Deploying Application (production)'
+    - docker-compose --project-name ${PROJECT_NAME}_production --file docker-production.yml build --no-cache
+    - docker-compose --project-name ${PROJECT_NAME}_production --file docker-production.yml up -d --force-recreate --remove-orphans
+  environment:
+    name: Production
+    url: https://${URL_NAME}.${BASE_URL}
+    on_stop: stop_production
+  only:
+    - master
+  tags:
+    - env-production
+
+stop_production:
+  stage: deploy
+  when: manual
+  script:
+    - echo 'Stopping Application (production)'
+    - docker-compose --project-name ${PROJECT_NAME}_production --file docker-production.yml stop
+  environment:
+    name: Production
+    action: stop
+  only:
+    - master
+  tags:
+    - env-production

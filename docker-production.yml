@@ -1,0 +1,20 @@
+version: "2"
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+
+services:
+  site:
+    restart: unless-stopped
+    build: .
+    command: bash -c 'node app.js'
+    ports:
+      - 8080
+    environment:
+      - API_HOST=https://api.${URL_NAME}.${BASE_URL}
+      # Nginx SSL Proxy
+      - VIRTUAL_HOST=${URL_NAME}.${BASE_URL}
+      - LETSENCRYPT_HOST=${URL_NAME}.${BASE_URL}
+      - LETSENCRYPT_EMAIL=${USER_EMAIL}
