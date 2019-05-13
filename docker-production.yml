@@ -4,6 +4,11 @@ networks:
   default:
     external:
       name: nginx-proxy
+  internal:
+    internal: true
+
+volumes:
+  mongo:
 
 services:
   site:
@@ -24,6 +29,11 @@ services:
     restart: unless-stopped # Restart policy to start on reboot
     volumes:
       - mongo:/data/db
+    networks:
+      default: {}
+      internal:
+        aliases:
+          - ${PROJECT_NAME}_production_mongo
     ports:
       - 27017:27017
   mongoexpress:
@@ -34,10 +44,19 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: atebw9abaf34em82
       ME_CONFIG_SITE_COOKIESECRET: ad3s585f46radxfh23424w
       ME_CONFIG_SITE_SESSIONSECRET: qrd2diosl3adh2334xf7kl
+      # MongoDB Connection Auth Config
+      ME_CONFIG_MONGODB_SERVER: ${PROJECT_NAME}_production_mongo
+      ME_CONFIG_MONGODB_URL: mongodb://${PROJECT_NAME}_production_mongo:27017/
+      # LetsEncrypt
       LETSENCRYPT_EMAIL: # empty env var will get the value from the host machine
+      VIRTUAL_HOST: db.${URL_NAME}.${MAIN_URL}
+      LETSENCRYPT_HOST: db.${URL_NAME}.${MAIN_URL}
     depends_on:
       - mongo
     ports:
       - 8081:8081
+    networks:
+      - default
+      - internal
 
 
