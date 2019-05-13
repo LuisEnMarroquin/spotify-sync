@@ -11,7 +11,7 @@ services:
     build: .
     command: bash -c 'node app.js'
     ports:
-      - 8080
+      - 8888
     environment:
       - API_HOST=https://api.${URL_NAME}.${BASE_URL}
       # Nginx SSL Proxy
