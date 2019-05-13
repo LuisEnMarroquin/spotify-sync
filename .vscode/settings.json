@@ -1,0 +1,12 @@
+{
+  "editor.tabSize": 2,
+  "search.exclude": {
+    "**/package-lock.json": true,
+    "**/yarn.lock": true
+  },
+  "files.exclude": {
+    "**/.DS_store": true,
+    "**/.directory": true,
+    "**/desktop.ini": true
+  }
+}

@@ -1,8 +1,11 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
     <title>Example of the Authorization Code flow with Spotify</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.min.css" async>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="Description" content="An app to save Spotify play history.">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <style type="text/css">
@@ -10,9 +13,9 @@
         display: none;
       }
       .text-overflow {
-        overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        overflow: hidden;
         width: 500px;
       }
     </style>
@@ -21,7 +24,7 @@
   <body>
     <div class="container">
       <div id="login">
-        <h1>This is an example of the Authorization Code flow</h1>
+        <h1>Authorization Code flow</h1>
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
@@ -30,6 +33,7 @@
         <div id="oauth">
         </div>
         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
+        <button class="btn btn-default" id="obtain-last-50">Get last 50 played songs</button>
       </div>
     </div>
 
@@ -37,7 +41,7 @@
       <h1>Logged in as {{display_name}}</h1>
       <div class="media">
         <div class="pull-left">
-          <img class="media-object" width="150" src="{{images.0.url}}" />
+          <img class="media-object" width="150" src="{{images.0.url}}" alt='' />
         </div>
         <div class="media-body">
           <dl class="dl-horizontal">
@@ -62,7 +66,7 @@
     </script>
 
     <script src="handlebars.min.js"></script>
-    <script src="jquery-1.10.1.min.js"></script>
+    <script src="jquery.min.js"></script>
     <script>
       (function() {
 
@@ -136,6 +140,19 @@
               });
             });
           }, false);
+
+          document.getElementById('obtain-last-50').addEventListener('click', function() {
+            $.ajax({
+              url: '/last_played',
+              data: {
+                'access_token': access_token,
+                'refresh_token': refresh_token
+              }
+            }).done(function(data) {
+              console.log(data.body.items)
+            });
+          }, false);
+
         }
       })();
     </script>

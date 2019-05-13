@@ -14,5 +14,26 @@
     "express": "^4.16.0",
     "mongoose": "^5.5.7",
     "request": "^2.83.0"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      ".git",
+      ".gitlab",
+      ".vscode/",
+      "yarn.lock",
+      ".DS_store",
+      ".gitignore",
+      ".directory",
+      "Dockerfile",
+      "desktop.ini",
+      ".dockerignore",
+      "node_modules/",
+      ".gitlab-ci.yml",
+      "docker-production.yml"
+    ],
+    "env": {
+      "NODE_ENV": "DEVELOPMENT"
+    },
+    "ext": "html,pug,css,styl,js,ts,vue,json"
   }
 }
