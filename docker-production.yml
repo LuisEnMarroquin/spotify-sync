@@ -48,8 +48,8 @@ services:
       ME_CONFIG_MONGODB_SERVER: ${PROJECT_NAME}_production_mongo
       ME_CONFIG_MONGODB_URL: mongodb://${PROJECT_NAME}_production_mongo:27017/
       # Nginx SSL Proxy
-      VIRTUAL_HOST: db.${URL_NAME}.${USER_EMAIL}
-      LETSENCRYPT_HOST: db.${URL_NAME}.${USER_EMAIL}
+      VIRTUAL_HOST: db.${URL_NAME}.${BASE_URL}
+      LETSENCRYPT_HOST: db.${URL_NAME}.${BASE_URL}
       LETSENCRYPT_EMAIL: ${USER_EMAIL}
     depends_on:
       - mongo
