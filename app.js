@@ -1,6 +1,7 @@
 var cookieParser = require('cookie-parser')
-var querystring = require('querystring')
-var compression = require('compression')
+var querystring = require('querystring') 
+var compression = require('compression') // Compress public folder
+var mongoose = require('mongoose') // MongoDB with schemas framework
 var express = require('express') // Express web server framework
 var request = require('request') // "Request" library
 var cors = require('cors')
@@ -48,7 +49,7 @@ app.get('/login', function (req, res) {
     }))
 })
 
-app.get('/callback', function (req, res) { 
+app.get('/callback', function (req, res) {
   // your application requests refresh and access token after checking the state parameter
 
   var code = req.query.code || null
@@ -70,7 +71,7 @@ app.get('/callback', function (req, res) {
         grant_type: 'authorization_code'
       },
       headers: {
-        'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
       },
       json: true
     }
@@ -112,15 +113,13 @@ app.get('/refresh_token', function (req, res) {
   // requesting access token from refresh token
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+    headers: { 'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')) },
     form: {
       grant_type: 'refresh_token',
       refresh_token: req.query.refresh_token
     },
     json: true
   }
-
-  console.log(new Buffer(client_id + ':' + client_secret).toString('base64'))
 
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
@@ -132,6 +131,23 @@ app.get('/refresh_token', function (req, res) {
   })
 })
 
+// Mongoose deprecations // https://mongoosejs.com/docs/deprecations.html
+mongoose.set('useNewUrlParser', true)
+mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true)
 
-console.log('Listening on 8888')
-app.listen(8888)
+var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
+
+// Database connection
+mongoose.connect(DATABASE_URL)
+  .then(() => {
+    console.log(`Database on ${DATABASE_URL}`)
+  })
+  .then(() => app.listen(8888, () => {
+    console.log('Listening on 8888')
+  }))
+  .catch((error) => {
+    console.log('Error at server startup')
+    console.error(error)
+  })
+
