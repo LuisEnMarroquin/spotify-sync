@@ -47,10 +47,10 @@ services:
       # MongoDB Connection Auth Config
       ME_CONFIG_MONGODB_SERVER: ${PROJECT_NAME}_production_mongo
       ME_CONFIG_MONGODB_URL: mongodb://${PROJECT_NAME}_production_mongo:27017/
-      # LetsEncrypt
-      LETSENCRYPT_EMAIL: # empty env var will get the value from the host machine
-      VIRTUAL_HOST: db.${URL_NAME}.${MAIN_URL}
-      LETSENCRYPT_HOST: db.${URL_NAME}.${MAIN_URL}
+      # Nginx SSL Proxy
+      VIRTUAL_HOST: db.${URL_NAME}.${USER_EMAIL}
+      LETSENCRYPT_HOST: db.${URL_NAME}.${USER_EMAIL}
+      LETSENCRYPT_EMAIL: ${USER_EMAIL}
     depends_on:
       - mongo
     ports:
