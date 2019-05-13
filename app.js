@@ -7,7 +7,7 @@ var cors = require('cors')
 
 var client_id = '88f6696309ca49ada0261312613bcac0' // Your client id
 var client_secret = 'e55db49b5ff544a78fff96efd3b248c5' // Your secret
-var redirect_uri = 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
+var redirect_uri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
 
 /**
  * Generates a random string containing numbers and letters

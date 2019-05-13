@@ -1,8 +1,0 @@
-version: "2"
-
-services:
-  site:
-    restart: unless-stopped
-    build: .
-    ports:
-      - 8888

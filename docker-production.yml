@@ -13,7 +13,7 @@ services:
     ports:
       - 8888
     environment:
-      - API_HOST=https://api.${URL_NAME}.${BASE_URL}
+      - API_HOST=https://spotify.marroquin.dev/callback
       # Nginx SSL Proxy
       - VIRTUAL_HOST=${URL_NAME}.${BASE_URL}
       - LETSENCRYPT_HOST=${URL_NAME}.${BASE_URL}
