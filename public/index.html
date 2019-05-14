@@ -9,15 +9,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        width: 500px;
-      }
+      #login, #loggedin { display: none; }
+      .text-overflow { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin: 10px; }
     </style>
   </head>
 
@@ -119,18 +112,22 @@
                   $('#login').hide();
                   $('#loggedin').show();
                 }
-            });
-          } else {
-              // render initial screen
+            })
+            .fail(function() { // If it fails it's maybe because your token is expired
+              window.location.hash = '' // Cleaning hash from url
               $('#login').show();
               $('#loggedin').hide();
+            })
+          } else { // show initial screen
+            $('#login').show();
+            $('#loggedin').hide();
           }
 
           document.getElementById('obtain-new-token').addEventListener('click', function() {
             $.ajax({
               url: '/refresh_token',
               data: {
-                'refresh_token': refresh_token
+                refresh_token
               }
             }).done(function(data) {
               access_token = data.access_token;
@@ -145,8 +142,8 @@
             $.ajax({
               url: '/last_played',
               data: {
-                'access_token': access_token,
-                'refresh_token': refresh_token
+                access_token,
+                refresh_token
               }
             }).done(function(data) {
               console.log(data.body.items)

@@ -1,6 +1,7 @@
 var cookieParser = require('cookie-parser')
 var querystring = require('querystring')
 var compression = require('compression') // Compress public folder
+var CronJob = require('cron').CronJob
 var mongoose = require('mongoose') // MongoDB with schemas framework
 var express = require('express') // Express web server framework
 var request = require('request') // "Request" library
@@ -31,16 +32,6 @@ var generateRandomString = function (length) {
   }
   return text
 }
-
-// // // /**
-// // //  * Gets user's the 50 most recently played tracks
-// // //  * @param  {object} user The user who will get tracks
-// // //  * @return {string} The generated string if this was successfull
-// // //  */
-// // // var last50Tracks = function (user) {
-// // //   console.log(user)
-// // //   return user
-// // // }
 
 var stateKey = 'spotify_auth_state'
 
@@ -162,8 +153,6 @@ app.get('/last_played', function (req, res) {
   var authOptions = {
     url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
     headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
       'Authorization': 'Bearer ' + req.query.access_token
     },
     json: true
@@ -171,14 +160,28 @@ app.get('/last_played', function (req, res) {
   // Responding request
   request.get(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      // Saving tracks
-      console.log(response.body.items)
-      // Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
-      //   .then(data => {
-      //     if (!data) console.log('New track!') // If is a new track
-      //     else console.log('Existing track!') // Track was previously there
-      //   })
-      //   .catch(err => { console.log(err) })
+      response.body.items.forEach(function (element) {
+        // Saving tracks
+        try {
+          if (element != null) {
+            if (element.track != null) {
+              if (element.track.explicit) delete element.track.explicit
+              if (element.track.is_local) delete element.track.is_local
+              if (element.track.available_markets) delete element.track.available_markets
+              if (element.track.album != null) {
+                if (element.track.album.available_markets) delete element.track.album.available_markets
+              }
+            }
+          }
+        } catch (err) { console.log(`Deletion error: ${err}`) }
+        // Saving to DB
+        Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec()
+          .then(data => {
+            if (!data) console.log('New track!') // If is a new track
+            else console.log('Existing track!') // Track was previously there
+          })
+          .catch(err => { console.log(err) })
+      })
       // Everything nice
       res.send(response)
     } else {
@@ -186,6 +189,73 @@ app.get('/last_played', function (req, res) {
     }
   })
 })
+
+// CronJob
+new CronJob('0 * * * *', function () { // Every hour yes it has 6 dots, most have five fields, and 1 minute as the finest granularity, but this library has six fields, with 1 second as the finest granularity.
+  console.log('You will see this message every hour')
+  Users.find({}).lean().exec()
+    .then(data => {
+      data.forEach(function (elm) {
+        console.log(elm)
+        // Refreshing token
+        var authOptions = {
+          url: 'https://accounts.spotify.com/api/token',
+          headers: { 'Authorization': 'Basic ' + bufferAuth },
+          form: {
+            grant_type: 'refresh_token',
+            refresh_token: elm.refreshToken
+          },
+          json: true
+        }
+        // Call spotify to refresh token
+        request.post(authOptions, function (error, response, body) {
+          if (!error && response.statusCode === 200) {
+            // requesting access token from refresh token
+            var authOptions2 = {
+              url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+              headers: {
+                'Authorization': 'Bearer ' + body.access_token
+              },
+              json: true
+            }
+            // Responding request
+            request.get(authOptions2, function (error, response, body) {
+              if (!error && response.statusCode === 200) {
+                response.body.items.forEach(function (element) {
+                  // Saving tracks
+                  try {
+                    if (element != null) {
+                      if (element.track != null) {
+                        if (element.track.explicit) delete element.track.explicit
+                        if (element.track.is_local) delete element.track.is_local
+                        if (element.track.available_markets) delete element.track.available_markets
+                        if (element.track.album != null) {
+                          if (element.track.album.available_markets) delete element.track.album.available_markets
+                        }
+                      }
+                    }
+                  } catch (err) { console.log(`Deletion error: ${err}`) }
+                  // Saving to DB
+                  Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec()
+                    .then(data => {
+                      if (!data) console.log('New track!') // If is a new track
+                      else console.log('Existing track!') // Track was previously there
+                    })
+                    .catch(err => { console.log(err) })
+                })
+                // Everything nice
+              } else {
+                console.log('Error', error)
+              }
+            })
+          } else {
+            console.log('Can not refresh token')
+          }
+        })
+      })
+    })
+    .catch(err => { console.log(err) })
+}, null, true, 'America/Los_Angeles')
 
 // Mongoose deprecations // https://mongoosejs.com/docs/deprecations.html
 mongoose.set('useNewUrlParser', true)
