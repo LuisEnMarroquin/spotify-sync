@@ -19,7 +19,7 @@ services:
       - 8888
     environment:
       - API_HOST=https://spotify.marroquin.dev/callback
-      - DATABASE_URL=mongodb://mongo/backend
+      - DATABASE_URL=mongodb://mongo/spotify
       # Nginx SSL Proxy
       - VIRTUAL_HOST=${URL_NAME}.${BASE_URL}
       - LETSENCRYPT_HOST=${URL_NAME}.${BASE_URL}
