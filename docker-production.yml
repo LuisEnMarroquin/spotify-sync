@@ -12,9 +12,12 @@ volumes:
 
 services:
   site:
+    image: my.image.name:latest
     restart: unless-stopped
     build: .
     command: bash -c 'node app.js'
+    depends_on:
+      - mongo
     ports:
       - 8888
     environment:
