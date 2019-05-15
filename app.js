@@ -26,7 +26,6 @@ var bufferAuth = (Buffer.from(clientId + ':' + clientSecret).toString('base64'))
 var generateRandomString = function (length) {
   var text = ''
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
   for (var i = 0; i < length; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
@@ -34,9 +33,7 @@ var generateRandomString = function (length) {
 }
 
 var stateKey = 'spotify_auth_state'
-
 var app = express()
-
 app.use(cors())
 app.use(compression())
 app.use(cookieParser())
@@ -45,7 +42,6 @@ app.use(express.static(path.join(__dirname, '/public')))
 app.get('/login', function (req, res) {
   var state = generateRandomString(16)
   res.cookie(stateKey, state)
-
   // your application requests authorization
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
@@ -78,9 +74,7 @@ app.get('/callback', function (req, res) {
         redirect_uri: redirectUri,
         grant_type: 'authorization_code'
       },
-      headers: {
-        'Authorization': 'Basic ' + bufferAuth
-      },
+      headers: { 'Authorization': 'Basic ' + bufferAuth },
       json: true
     }
 
@@ -148,21 +142,17 @@ app.get('/refresh_token', function (req, res) {
   })
 })
 
-app.get('/last_played', function (req, res) {
-  // requesting access token from refresh token
-  var authOptions = {
-    url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
-    headers: {
-      'Authorization': 'Bearer ' + req.query.access_token
-    },
-    json: true
-  }
-  // Responding request
-  request.get(authOptions, function (error, response, body) {
+/**
+ * Ask for your last 50 played tracks
+ * @param  {number} length The length of the string
+ * @return {string} The generated string
+ */
+var last50Tracks = function (options, res = false) { // Responding request
+  console.log(new Date(Date.now()).toLocaleString())
+  request.get(options, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       response.body.items.forEach(function (element) {
-        // Saving tracks
-        try {
+        try { // Deleting trash data
           if (element != null) {
             if (element.track != null) {
               if (element.track.explicit) delete element.track.explicit
@@ -174,29 +164,36 @@ app.get('/last_played', function (req, res) {
             }
           }
         } catch (err) { console.log(`Deletion error: ${err}`) }
-        // Saving to DB
-        Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec()
+        Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
           .then(data => {
             if (!data) console.log('New track!') // If is a new track
             else console.log('Existing track!') // Track was previously there
           })
           .catch(err => { console.log(err) })
       })
-      // Everything nice
-      res.send(response)
+      if (res) res.send(response) // Everything nice
     } else {
-      res.send(error)
+      if (res) res.send(error)
+      console.log('Error', error)
     }
   })
+}
+
+app.get('/last_played', function (req, res) {
+  last50Tracks({
+    url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+    headers: { 'Authorization': 'Bearer ' + req.query.access_token },
+    json: true
+  }, res)
 })
 
 // CronJob
-new CronJob('0 * * * *', function () { // Every hour yes it has 6 dots, most have five fields, and 1 minute as the finest granularity, but this library has six fields, with 1 second as the finest granularity.
+new CronJob('0 15 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
       data.forEach(function (elm) {
-        console.log(elm)
+        console.log(elm.display_name)
         // Refreshing token
         var authOptions = {
           url: 'https://accounts.spotify.com/api/token',
@@ -210,46 +207,13 @@ new CronJob('0 * * * *', function () { // Every hour yes it has 6 dots, most hav
         // Call spotify to refresh token
         request.post(authOptions, function (error, response, body) {
           if (!error && response.statusCode === 200) {
-            // requesting access token from refresh token
-            var authOptions2 = {
+            last50Tracks({
               url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
-              headers: {
-                'Authorization': 'Bearer ' + body.access_token
-              },
+              headers: { 'Authorization': 'Bearer ' + body.access_token },
               json: true
-            }
-            // Responding request
-            request.get(authOptions2, function (error, response, body) {
-              if (!error && response.statusCode === 200) {
-                response.body.items.forEach(function (element) {
-                  // Saving tracks
-                  try {
-                    if (element != null) {
-                      if (element.track != null) {
-                        if (element.track.explicit) delete element.track.explicit
-                        if (element.track.is_local) delete element.track.is_local
-                        if (element.track.available_markets) delete element.track.available_markets
-                        if (element.track.album != null) {
-                          if (element.track.album.available_markets) delete element.track.album.available_markets
-                        }
-                      }
-                    }
-                  } catch (err) { console.log(`Deletion error: ${err}`) }
-                  // Saving to DB
-                  Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec()
-                    .then(data => {
-                      if (!data) console.log('New track!') // If is a new track
-                      else console.log('Existing track!') // Track was previously there
-                    })
-                    .catch(err => { console.log(err) })
-                })
-                // Everything nice
-              } else {
-                console.log('Error', error)
-              }
             })
           } else {
-            console.log('Can not refresh token')
+            console.log('Can not refresh token', error)
           }
         })
       })
