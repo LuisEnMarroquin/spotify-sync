@@ -188,12 +188,17 @@ app.get('/last_played', function (req, res) {
 })
 
 // CronJob
-new CronJob('0 42 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
+new CronJob('0 52 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
-      console.log('Database is up!')
+      // If you have no users
+      if (!data) {
+        console.log('You have no users')
+        return
+      }
       data.forEach(function (elm) {
+        // Showing username
         console.log(elm.display_name)
         // Refreshing token
         var authOptions = {
