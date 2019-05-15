@@ -188,11 +188,11 @@ app.get('/last_played', function (req, res) {
 })
 
 // CronJob
-new CronJob('0 32 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
+new CronJob('0 40 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
-      console.log('Uneeded console.log')
+      console.log('Database is up!')
       data.forEach(function (elm) {
         console.log(elm.display_name)
         // Refreshing token

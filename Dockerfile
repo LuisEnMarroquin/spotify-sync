@@ -1,7 +1,10 @@
 # NodeJS Alpine
-FROM node:10.7.0-slim
+FROM node:alpine
 
+# Show all node logs
 ENV NPM_CONFIG_LOGLEVEL warn
+
+# Create app directory
 RUN mkdir -p /opt/app
 
 # Copy Files
