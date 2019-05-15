@@ -12,7 +12,6 @@ volumes:
 
 services:
   site:
-    image: my.image.name:latest
     restart: unless-stopped
     build: .
     command: bash -c 'node app.js'
@@ -21,7 +20,7 @@ services:
     ports:
       - 8888
     environment:
-      - API_HOST=https://spotify.marroquin.dev/callback
+      - API_HOST=https://${URL_NAME}.${BASE_URL}/callback
       - DATABASE_URL=mongodb://mongo/spotify
       # Nginx SSL Proxy
       - VIRTUAL_HOST=${URL_NAME}.${BASE_URL}
