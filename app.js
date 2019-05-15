@@ -188,7 +188,7 @@ app.get('/last_played', function (req, res) {
 })
 
 // CronJob
-new CronJob('0 50 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
+new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
