@@ -14,7 +14,7 @@ services:
   site:
     restart: unless-stopped
     build: .
-    command: bash -c 'node app.js'
+    command: /bin/sh -c 'node app.js'
     depends_on:
       - mongo
     ports:
