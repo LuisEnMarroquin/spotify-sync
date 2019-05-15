@@ -98,9 +98,8 @@ app.get('/callback', function (req, res) {
           var newDoc = { ...body, accessToken, refreshToken, expireToken }
           Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
             .then(data => {
-              console.log(data)
-              if (!data) console.log('User created!') // If is a new user
-              else console.log('User updated!') // If user was previously in my app
+              if (!data) console.log('User created!', newDoc.display_name) // If is a new user
+              else console.log('User updated!', data.display_name) // If user was previously in my app
             })
             .catch(err => { console.log(err) })
         })
@@ -166,8 +165,8 @@ var last50Tracks = function (options, res = false) { // Responding request
         } catch (err) { console.log(`Deletion error: ${err}`) }
         Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
           .then(data => {
-            if (!data) console.log('New track!') // If is a new track
-            else console.log('Existing track!') // Track was previously there
+            if (!data) console.log('- New track!', element.track.name) // If is a new track
+            else console.log('- Existing track!', data.track.name) // Track was previously there
           })
           .catch(err => { console.log(err) })
       })
@@ -188,7 +187,7 @@ app.get('/last_played', function (req, res) {
 })
 
 // CronJob
-new CronJob('0 20 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
+new CronJob('0 45 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
