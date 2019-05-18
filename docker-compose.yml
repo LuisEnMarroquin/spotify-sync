@@ -12,13 +12,10 @@ volumes:
 
 services:
   site:
-    restart: unless-stopped
     build: .
     command: /bin/sh -c 'node app.js'
     depends_on:
       - mongo
-    ports:
-      - 8888
     environment:
       - API_HOST=https://${URL_NAME}.${BASE_URL}/callback
       - DATABASE_URL=mongodb://mongo/spotify
@@ -29,39 +26,40 @@ services:
     networks:
       - default
       - internal
+    ports:
+      - 8888
+    restart: unless-stopped
   mongo:
     image: mongo:3.4.10
-    restart: unless-stopped # Restart policy to start on reboot
-    volumes:
-      - mongo:/data/db
     networks:
-      default: {}
-      internal:
-        aliases:
-          - ${PROJECT_NAME}_production_mongo
+      - default
+      - internal
+    restart: unless-stopped
     ports:
       - 27017:27017
+    volumes:
+      - mongo:/data/db
   mongoexpress:
-    restart: unless-stopped # Restart policy to start on reboot
-    image: mongo-express
-    environment: # HTTP Basic Auth
+    depends_on:
+      - mongo
+    environment: 
+      # HTTP Basic Auth # MongoDB Connection Auth Config
       ME_CONFIG_BASICAUTH_USERNAME: wh34f34eed5ma9ia
       ME_CONFIG_BASICAUTH_PASSWORD: atebw9abaf34em82
       ME_CONFIG_SITE_COOKIESECRET: ad3s585f46radxfh23424w
       ME_CONFIG_SITE_SESSIONSECRET: qrd2diosl3adh2334xf7kl
-      # MongoDB Connection Auth Config
-      ME_CONFIG_MONGODB_SERVER: ${PROJECT_NAME}_production_mongo
+      ME_CONFIG_MONGODB_SERVER: ${PROJECT_NAME}_production_mongo 
       ME_CONFIG_MONGODB_URL: mongodb://${PROJECT_NAME}_production_mongo:27017/
       # Nginx SSL Proxy
       VIRTUAL_HOST: db.${URL_NAME}.${BASE_URL}
       LETSENCRYPT_HOST: db.${URL_NAME}.${BASE_URL}
       LETSENCRYPT_EMAIL: ${USER_EMAIL}
-    depends_on:
-      - mongo
-    ports:
-      - 8081:8081
+    image: mongo-express
     networks:
       - default
       - internal
+    ports:
+      - 8081:8081
+    restart: unless-stopped
 
 
