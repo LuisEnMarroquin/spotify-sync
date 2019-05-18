@@ -30,7 +30,7 @@ services:
       - default
       - internal
   mongo:
-    image: mongo:latest
+    image: mongo:3.4.10
     restart: unless-stopped # Restart policy to start on reboot
     volumes:
       - mongo:/data/db
