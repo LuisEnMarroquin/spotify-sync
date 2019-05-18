@@ -26,16 +26,21 @@ services:
       - VIRTUAL_HOST=${URL_NAME}.${BASE_URL}
       - LETSENCRYPT_HOST=${URL_NAME}.${BASE_URL}
       - LETSENCRYPT_EMAIL=${USER_EMAIL}
+    networks:
+      - default
+      - internal
   mongo:
-    image: mongo:3.4.10
+    image: mongo:latest
     restart: unless-stopped # Restart policy to start on reboot
     volumes:
       - mongo:/data/db
     networks:
-      default: {}
-      internal:
-        aliases:
-          - ${PROJECT_NAME}_production_mongo
+      - default
+      - internal
+      # default: {}
+      # internal:
+      #   aliases:
+      #     - ${PROJECT_NAME}_production_mongo
     ports:
       - 27017:27017
   mongoexpress:

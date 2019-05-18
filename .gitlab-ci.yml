@@ -13,7 +13,7 @@ deploy_production:
   stage: deploy
   script:
     - echo 'Deploying Application (production)'
-    - docker-compose --project-name ${PROJECT_NAME}_production --file docker-production.yml up -d --build --force-recreate --remove-orphans
+    - docker-compose --project-name ${PROJECT_NAME}_production up -d --build --force-recreate --remove-orphans
   environment:
     name: Production
     url: https://${URL_NAME}.${BASE_URL}
@@ -28,7 +28,7 @@ stop_production:
   when: manual
   script:
     - echo 'Stopping Application (production)'
-    - docker-compose --project-name ${PROJECT_NAME}_production --file docker-production.yml stop
+    - docker-compose --project-name ${PROJECT_NAME}_production stop
   environment:
     name: Production
     action: stop
