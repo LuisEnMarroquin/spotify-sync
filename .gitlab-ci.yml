@@ -5,29 +5,29 @@ stages:
 
 variables:
   URL_NAME: spotify
-  PROJECT_NAME: spotify_app
   BASE_URL: marroquin.dev
+  PROJECT_NAME: spotify_app
   USER_EMAIL: luis@marroquin.dev
 
-deploy_production:
-  stage: deploy
+deploy:
+  stage: deployment
   script:
-    - echo 'Deploying Application (production)'
+    - echo 'Deploying Production'
     - docker-compose --project-name ${PROJECT_NAME}_production up -d --build --force-recreate --remove-orphans
   environment:
     name: Production
     url: https://${URL_NAME}.${BASE_URL}
-    on_stop: stop_production
+    on_stop: stop
   only:
     - master
   tags:
     - env-production
 
-stop_production:
-  stage: deploy
+stop:
+  stage: deployment
   when: manual
   script:
-    - echo 'Stopping Application (production)'
+    - echo 'Stopping Production'
     - docker-compose --project-name ${PROJECT_NAME}_production stop
   environment:
     name: Production
