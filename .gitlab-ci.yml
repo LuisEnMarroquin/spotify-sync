@@ -10,7 +10,7 @@ variables:
   USER_EMAIL: luis@marroquin.dev
 
 deploy:
-  stage: deployment
+  stage: deploy
   script:
     - echo 'Deploying Production'
     - docker-compose --project-name ${PROJECT_NAME}_production up -d --build --force-recreate --remove-orphans
@@ -24,7 +24,7 @@ deploy:
     - env-production
 
 stop:
-  stage: deployment
+  stage: deploy
   when: manual
   script:
     - echo 'Stopping Production'
