@@ -12,10 +12,13 @@ variables:
 deploy:
   stage: deploy
   script:
-    - echo 'Deploying Production' CI_COMMIT_REF_NAME
+    - echo 'Deploying Production'
+    - echo $CI_COMMIT_REF_NAME
+    - echo ${CI_COMMIT_REF_NAME}
     - docker-compose --project-name ${PROJECT_NAME}_production up -d --build --force-recreate --remove-orphans
   environment:
-    FULL_URL: ${URL_NAME}.${BASE_URL}
+    name: Production
+    url: https://${URL_NAME}.${BASE_URL}
   only:
     - master
   tags:
@@ -27,6 +30,8 @@ stop:
   script:
     - echo 'Stopping Production'
     - docker-compose --project-name ${PROJECT_NAME}_production stop
+  environment:
+    name: Production
   only:
     - master
   tags:
