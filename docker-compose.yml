@@ -36,11 +36,9 @@ services:
       - mongo:/data/db
     networks:
       - default
-      - internal
-      # default: {}
-      # internal:
-      #   aliases:
-      #     - ${PROJECT_NAME}_production_mongo
+      internal:
+        aliases:
+          - ${PROJECT_NAME}_production_mongo
     ports:
       - 27017:27017
   mongoexpress:
