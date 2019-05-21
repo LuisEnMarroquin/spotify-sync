@@ -12,7 +12,7 @@ variables:
 deploy:
   stage: deploy
   script:
-    - echo 'Deploying ${CI_COMMIT_REF_NAME}'
+    - echo 'Deploying' ${CI_COMMIT_REF_NAME}
     - docker-compose --project-name ${PROJECT_NAME}_production up -d --build --force-recreate --remove-orphans
   environment:
     name: Production
@@ -26,7 +26,7 @@ stop:
   stage: deploy
   when: manual
   script:
-    - echo 'Stopping ${CI_COMMIT_REF_NAME}'
+    - echo 'Stopping' ${CI_COMMIT_REF_NAME}
     - docker-compose --project-name ${PROJECT_NAME}_production stop
   environment:
     name: Production

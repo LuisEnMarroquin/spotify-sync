@@ -2,7 +2,7 @@
   "author": "Spotify",
   "name": "web-api-auth-examples",
   "description": "Basic example of the Spotify authorization flow through OAuth 2",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "nodemon app.js"
@@ -14,8 +14,7 @@
     "cron": "^1.7.1",
     "express": "^4.16.0",
     "mongoose": "^5.5.7",
-    "request": "^2.83.0",
-    "underscore": "^1.9.1"
+    "request": "^2.83.0"
   },
   "nodemonConfig": {
     "ignore": [

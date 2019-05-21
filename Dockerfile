@@ -14,4 +14,4 @@ COPY . /opt/app
 WORKDIR /opt/app/
 
 # Install Dependncies
-RUN yarn install --ignore-scripts --audit
+RUN yarn install --production --ignore-optional --ignore-scripts --audit
