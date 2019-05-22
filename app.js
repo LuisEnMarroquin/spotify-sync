@@ -31,7 +31,7 @@ var generateRandomString = function (length) {
   }
   return text
 }
-
+console.log(redirectUri)
 var stateKey = 'spotify_auth_state'
 var app = express()
 app.use(cors())

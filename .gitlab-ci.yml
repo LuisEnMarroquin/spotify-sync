@@ -4,10 +4,10 @@ stages:
   - deploy
 
 variables:
-  URL_NAME: spotify
-  BASE_URL: marroquin.dev
+  FULL_URL: spotify.marroquin.dev
   PROJECT_NAME: spotify_app
   USER_EMAIL: luis@marroquin.dev
+  PORT: 8888
 
 deploy:
   stage: deploy
@@ -16,7 +16,7 @@ deploy:
     - docker-compose --project-name ${PROJECT_NAME}_production up -d --build --force-recreate --remove-orphans
   environment:
     name: Production
-    url: https://${URL_NAME}.${BASE_URL}
+    url: https://${FULL_URL}
   only:
     - master
   tags:

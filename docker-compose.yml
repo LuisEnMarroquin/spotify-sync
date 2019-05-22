@@ -1,4 +1,4 @@
-version: "2"
+version: "3.3"
 
 networks:
   default:
@@ -17,21 +17,22 @@ services:
     depends_on:
       - mongo
     environment:
-      - API_HOST=https://${URL_NAME}.${BASE_URL}/callback
+      - API_HOST=http://${FULL_URL:-localhost:8888}/callback
       - DATABASE_URL=mongodb://mongo/spotify
       # Nginx SSL Proxy
-      - VIRTUAL_HOST=${URL_NAME}.${BASE_URL}
-      - LETSENCRYPT_HOST=${URL_NAME}.${BASE_URL}
+      - VIRTUAL_HOST=${FULL_URL}
+      - LETSENCRYPT_HOST=${FULL_URL}
       - LETSENCRYPT_EMAIL=${USER_EMAIL}
     networks:
       - default
       - internal
     ports:
-      - 8888
+      - ${PORT:-8888:8888}
     restart: unless-stopped
   mongo:
     image: mongo:3.4.20
     networks:
+      default: {}
       internal:
         aliases:
           - ${PROJECT_NAME}_production_mongo
@@ -53,8 +54,8 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://${PROJECT_NAME}_production_mongo:27017/
       # Nginx SSL Proxy
       LETSENCRYPT_EMAIL: ${USER_EMAIL}
-      LETSENCRYPT_HOST: db.${URL_NAME}.${BASE_URL}
-      VIRTUAL_HOST: db.${URL_NAME}.${BASE_URL}
+      LETSENCRYPT_HOST: db.${FULL_URL}
+      VIRTUAL_HOST: db.${FULL_URL}
     image: mongo-express
     networks:
       - default

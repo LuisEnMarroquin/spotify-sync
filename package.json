@@ -5,7 +5,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans"
   },
   "dependencies": {
     "compression": "^1.7.4",
