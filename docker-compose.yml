@@ -8,6 +8,7 @@ networks:
 
 volumes:
   mongo:
+  mongoc:
   modules:
 
 services:
@@ -40,6 +41,7 @@ services:
     restart: unless-stopped
     volumes:
       - mongo:/data/db
+      - mongoc:/data/configdb
   mongoexpress:
     depends_on:
       - mongo
