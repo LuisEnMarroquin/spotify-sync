@@ -30,9 +30,8 @@ services:
       - ${PORT:-8888:8888}
     restart: unless-stopped
   mongo:
-    image: mongo:3.6
+    image: mongo:4.0
     networks:
-      default: {}
       internal:
         aliases:
           - ${PROJECT_NAME}_production_mongo
