@@ -8,6 +8,7 @@ networks:
 
 volumes:
   mongo:
+  modules:
 
 services:
   site:
@@ -28,6 +29,8 @@ services:
     ports:
       - ${PORT:-8888:8888}
     restart: unless-stopped
+    volumes:
+      - modules:/opt/app/node_modules
   mongo:
     image: mongo:latest
     networks:

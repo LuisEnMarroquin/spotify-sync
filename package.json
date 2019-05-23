@@ -31,7 +31,7 @@
       ".dockerignore",
       "node_modules/",
       ".gitlab-ci.yml",
-      "docker-production.yml"
+      "docker-compose.yml"
     ],
     "env": {
       "NODE_ENV": "DEVELOPMENT"
