@@ -30,7 +30,7 @@ services:
       - ${PORT:-8888:8888}
     restart: unless-stopped
   mongo:
-    image: mongo:3.4.20
+    image: mongo:3.4.10
     networks:
       default: {}
       internal:

@@ -165,8 +165,8 @@ var last50Tracks = function (options, res = false) { // Responding request
         } catch (err) { console.log(`Deletion error: ${err}`) }
         Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
           .then(data => {
-            if (!data) console.log('- New track!', element.track.name) // If is a new track
-            else console.log('- Existing track!', data.track.name) // Track was previously there
+            if (!data) console.log('- New track!', element.track.name, element.played_at) // If is a new track
+            else console.log('- Existing track!', data.track.name, data.played_at) // Track was previously there
           })
           .catch(err => { console.log(err) })
       })
@@ -211,7 +211,8 @@ new CronJob('0 45 * * * *', function () { // Every hour, yes it has 6 dots, most
         }
         // Call spotify to refresh token
         request.post(authOptions, function (error, response, body) {
-          if (!error && response.statusCode === 200) {
+          console.log(body)
+          if (!error && body.access_token && response.statusCode === 200) {
             last50Tracks({
               url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
               headers: { 'Authorization': 'Bearer ' + body.access_token },
