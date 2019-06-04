@@ -1,7 +1,9 @@
-# Trash
+# File managers
 .DS_Store
 .directory
 desktop.ini
+
+# Folders
 node_modules/
 
 # Logs

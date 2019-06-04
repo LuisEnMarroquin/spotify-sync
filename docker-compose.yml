@@ -53,7 +53,7 @@ services:
       LETSENCRYPT_EMAIL: ${USER_EMAIL}
       LETSENCRYPT_HOST: db.${FULL_URL}
       VIRTUAL_HOST: db.${FULL_URL}
-    image: mongo-express
+    image: mongo-express:latest
     networks:
       - external
       - internal

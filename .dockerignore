@@ -1,6 +1,9 @@
+**/*.md
 **/.git
+**/*.yml
 **/.vscode
 **/.DS_Store
+**/Dockerfile
 **/.directory
 **/desktop.ini
 **/node_modules
