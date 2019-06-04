@@ -1,4 +1,4 @@
-version: "3.5"
+version: "3.7"
 
 networks:
   external:
@@ -9,7 +9,6 @@ networks:
 volumes:
   mongo:
   mongoc:
-  modules:
 
 services:
   site:
@@ -28,12 +27,10 @@ services:
       - external
       - internal
     ports:
-      - ${PORT:-8888:8888}
+      - ${PORT_APP_CI:-8888:8888}
     restart: unless-stopped
-    volumes:
-      - modules:/opt/app/node_modules
   mongo:
-    image: mongo:latest
+    image: mongo:4.0
     networks:
       - internal
     ports:
@@ -56,12 +53,10 @@ services:
       LETSENCRYPT_EMAIL: ${USER_EMAIL}
       LETSENCRYPT_HOST: db.${FULL_URL}
       VIRTUAL_HOST: db.${FULL_URL}
-    image: mongo-express:latest
+    image: mongo-express
     networks:
       - external
       - internal
     ports:
-      - 8081:8081
+      - ${PORT_EXP_CI:-8690:8081}
     restart: unless-stopped
-
-
