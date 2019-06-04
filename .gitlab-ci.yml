@@ -10,7 +10,6 @@ variables:
   PORT_EXP_CI: 8081
   PORT_APP_CI: 8888
 
-
 deploy:
   stage: deploy
   script:

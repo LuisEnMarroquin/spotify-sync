@@ -150,6 +150,19 @@ var last50Tracks = function (options, res = false) { // Responding request
   console.log(new Date(Date.now()).toLocaleString())
   request.get(options, function (error, response, body) {
     if (!error && response.statusCode === 200) {
+
+      // Enter new data
+      // response.body.items = [
+      //   {"_id":{ "$oid": "5cd9ef044a24c1649ea570bd" },"played_at":"2019-05-13T18:42:03.843Z","context":{"uri":"spotify:playlist:37i9dQZF1DZ06evO46wsnu","external_urls":{"spotify":"https://open.spotify.com/playlist/37i9dQZF1DZ06evO46wsnu"},"href":"https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO46wsnu","type":"playlist"},"createdAt":"2019-05-13T22:26:12.580Z","track":{"album":{"album_type":"album","artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"external_urls":{"spotify":"https://open.spotify.com/album/2Gq0ERke26yxdGuRvrqFTD"},"href":"https://api.spotify.com/v1/albums/2Gq0ERke26yxdGuRvrqFTD","id":"2Gq0ERke26yxdGuRvrqFTD","images":[{"height":640,"url":"https://i.scdn.co/image/d2046d9cc60a6d13d31e352c15b34a7f828c7556","width":640},{"height":300,"url":"https://i.scdn.co/image/25426703fa7efbb6a80d752e5cfaa074c76fd3ed","width":300},{"height":64,"url":"https://i.scdn.co/image/93361c25eb95d226b5f0324b3fb4704934e05645","width":64}],"name":"Endgame","release_date":"2011-01-01","release_date_precision":"day","total_tracks":12,"type":"album","uri":"spotify:album:2Gq0ERke26yxdGuRvrqFTD"},"artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"disc_number":1,"duration_ms":239893,"explicit":false,"external_ids":{"isrc":"USUM71101044"},"external_urls":{"spotify":"https://open.spotify.com/track/6z38xRV0gxWMyjtuz5T2Ea"},"href":"https://api.spotify.com/v1/tracks/6z38xRV0gxWMyjtuz5T2Ea","id":"6z38xRV0gxWMyjtuz5T2Ea","is_local":false,"name":"Survivor Guilt","popularity":49,"preview_url":"https://p.scdn.co/mp3-preview/36e69e5a62dab3283ab495ada420ba252147b84b?cid=88f6696309ca49ada0261312613bcac0","track_number":7,"type":"track","uri":"spotify:track:6z38xRV0gxWMyjtuz5T2Ea"},"updatedAt":"2019-05-14T03:03:43.019Z"},
+      // ]
+      // response.body.items.forEach(function (element) {
+      //   try { // Deleting trash data
+      //     if (element != null) {
+      //       if (element._id != null) delete element._id
+      //     }
+      //   } catch (err) { console.log(`Deletion error: ${err}`) }
+      // })
+
       response.body.items.forEach(function (element) {
         try { // Deleting trash data
           if (element != null) {

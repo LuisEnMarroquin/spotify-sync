@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "nodemon app.js",
+    "stop": "docker-compose --project-name spoty stop",
     "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans"
   },
   "dependencies": {
