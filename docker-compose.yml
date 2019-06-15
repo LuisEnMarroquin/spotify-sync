@@ -17,12 +17,12 @@ services:
     depends_on:
       - mongo
     environment:
-      - API_HOST=http://${FULL_URL:-localhost:8888}/callback
-      - DATABASE_URL=mongodb://mongo/spotify
+      API_HOST: http://${FULL_URL:-localhost:8888}/callback
+      DATABASE_URL: mongodb://mongo/spotify
       # Nginx SSL Proxy
-      - VIRTUAL_HOST=${FULL_URL}
-      - LETSENCRYPT_HOST=${FULL_URL}
-      - LETSENCRYPT_EMAIL=${USER_EMAIL}
+      VIRTUAL_HOST: ${FULL_URL}
+      LETSENCRYPT_HOST: ${FULL_URL}
+      LETSENCRYPT_EMAIL: ${USER_EMAIL}
     networks:
       - external
       - internal
