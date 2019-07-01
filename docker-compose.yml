@@ -11,7 +11,7 @@ volumes:
   mongoc:
 
 services:
-  site:
+  app:
     build: .
     command: /bin/sh -c 'node app.js'
     depends_on:
@@ -39,7 +39,7 @@ services:
     volumes:
       - mongo:/data/db
       - mongoc:/data/configdb
-  mongoexpress:
+  express:
     depends_on:
       - mongo
     environment: 
