@@ -15,16 +15,23 @@
     "cors": "^2.8.4",
     "cron": "^1.7.1",
     "express": "^4.16.0",
+    "helmet": "^3.20.0",
     "mongoose": "^5.5.7",
     "request": "^2.83.0"
+  },
+  "standard": {
+    "ignore": [
+      "/public/handlebars.min.js",
+      "/public/jquery.min.js"
+    ]
   },
   "nodemonConfig": {
     "ignore": [
       ".git",
+      ".github",
       ".gitlab",
       ".vscode/",
-      "yarn.lock",
-      ".DS_store",
+      ".DS_Store",
       ".gitignore",
       ".directory",
       "Dockerfile",

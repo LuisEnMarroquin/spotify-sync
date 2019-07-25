@@ -5,6 +5,7 @@ var CronJob = require('cron').CronJob
 var mongoose = require('mongoose') // MongoDB with schemas framework
 var express = require('express') // Express web server framework
 var request = require('request') // "Request" library
+const helmet = require('helmet')
 var cors = require('cors')
 var path = require('path')
 
@@ -13,6 +14,7 @@ var Users = require('./models/users')
 var Tracks = require('./models/tracks')
 
 // Spotify Dashboard variables
+var stateKey = 'spotify_auth_state' // Which type of key
 var clientId = '88f6696309ca49ada0261312613bcac0' // Your client id
 var clientSecret = 'e55db49b5ff544a78fff96efd3b248c5' // Your secret
 var redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
@@ -31,10 +33,10 @@ var generateRandomString = function (length) {
   }
   return text
 }
-console.log(redirectUri)
-var stateKey = 'spotify_auth_state'
+
 var app = express()
 app.use(cors())
+app.use(helmet())
 app.use(compression())
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, '/public')))
@@ -53,18 +55,13 @@ app.get('/login', function (req, res) {
     }))
 })
 
-app.get('/callback', function (req, res) {
-  // your application requests refresh and access token after checking the state parameter
-
+app.get('/callback', function (req, res) { // your application requests refresh and access token after checking the state parameter
   var code = req.query.code || null
   var state = req.query.state || null
   var storedState = req.cookies ? req.cookies[stateKey] : null
 
   if (state === null || state !== storedState) {
-    res.redirect('/#' +
-      querystring.stringify({
-        error: 'state_mismatch'
-      }))
+    res.redirect('/#' + querystring.stringify({ error: 'state_mismatch' }))
   } else {
     res.clearCookie(stateKey)
     var authOptions = {
@@ -93,7 +90,10 @@ app.get('/callback', function (req, res) {
         // use the access token to access the Spotify Web API
         request.get(options, function (error, response, body) {
           // Handling error
-          if (error) { console.log(error); return }
+          if (error) {
+            console.log(error)
+            return
+          }
           // console.log(body)
           var newDoc = { ...body, accessToken, refreshToken, expireToken }
           Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
@@ -111,10 +111,7 @@ app.get('/callback', function (req, res) {
             refresh_token: refreshToken
           }))
       } else {
-        res.redirect('/#' +
-          querystring.stringify({
-            error: 'invalid_token'
-          }))
+        res.redirect('/#' + querystring.stringify({ error: 'invalid_token' }))
       }
     })
   }
@@ -141,16 +138,10 @@ app.get('/refresh_token', function (req, res) {
   })
 })
 
-/**
- * Ask for your last 50 played tracks
- * @param  {number} length The length of the string
- * @return {string} The generated string
- */
 var last50Tracks = function (options, res = false) { // Responding request
   console.log(new Date(Date.now()).toLocaleString())
   request.get(options, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-
       // Enter new data
       // response.body.items = [
       //   {"_id":{ "$oid": "5cd9ef044a24c1649ea570bd" },"played_at":"2019-05-13T18:42:03.843Z","context":{"uri":"spotify:playlist:37i9dQZF1DZ06evO46wsnu","external_urls":{"spotify":"https://open.spotify.com/playlist/37i9dQZF1DZ06evO46wsnu"},"href":"https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO46wsnu","type":"playlist"},"createdAt":"2019-05-13T22:26:12.580Z","track":{"album":{"album_type":"album","artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"external_urls":{"spotify":"https://open.spotify.com/album/2Gq0ERke26yxdGuRvrqFTD"},"href":"https://api.spotify.com/v1/albums/2Gq0ERke26yxdGuRvrqFTD","id":"2Gq0ERke26yxdGuRvrqFTD","images":[{"height":640,"url":"https://i.scdn.co/image/d2046d9cc60a6d13d31e352c15b34a7f828c7556","width":640},{"height":300,"url":"https://i.scdn.co/image/25426703fa7efbb6a80d752e5cfaa074c76fd3ed","width":300},{"height":64,"url":"https://i.scdn.co/image/93361c25eb95d226b5f0324b3fb4704934e05645","width":64}],"name":"Endgame","release_date":"2011-01-01","release_date_precision":"day","total_tracks":12,"type":"album","uri":"spotify:album:2Gq0ERke26yxdGuRvrqFTD"},"artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"disc_number":1,"duration_ms":239893,"explicit":false,"external_ids":{"isrc":"USUM71101044"},"external_urls":{"spotify":"https://open.spotify.com/track/6z38xRV0gxWMyjtuz5T2Ea"},"href":"https://api.spotify.com/v1/tracks/6z38xRV0gxWMyjtuz5T2Ea","id":"6z38xRV0gxWMyjtuz5T2Ea","is_local":false,"name":"Survivor Guilt","popularity":49,"preview_url":"https://p.scdn.co/mp3-preview/36e69e5a62dab3283ab495ada420ba252147b84b?cid=88f6696309ca49ada0261312613bcac0","track_number":7,"type":"track","uri":"spotify:track:6z38xRV0gxWMyjtuz5T2Ea"},"updatedAt":"2019-05-14T03:03:43.019Z"},
@@ -167,8 +158,10 @@ var last50Tracks = function (options, res = false) { // Responding request
         try { // Deleting trash data
           if (element != null) {
             if (element.track != null) {
-              if (element.track.explicit) delete element.track.explicit
-              if (element.track.is_local) delete element.track.is_local
+              if (element.track.explicit) delete element.track.explicit // If equals false won't be deleted
+              if (element.track.explicit === false) delete element.track.explicit // Delete if equals false
+              if (element.track.is_local) delete element.track.is_local // If equals false won't be deleted
+              if (element.track.is_local === false) delete element.track.is_local // Delete if equals false
               if (element.track.available_markets) delete element.track.available_markets
               if (element.track.album != null) {
                 if (element.track.album.available_markets) delete element.track.album.available_markets
@@ -200,7 +193,7 @@ app.get('/last_played', function (req, res) {
 })
 
 // CronJob
-new CronJob('0 45 * * * *', function () { // Every hour, yes it has 6 dots, most have five fields, with 1 second as the finest granularity.
+new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 1 second as the finest granularity.
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
@@ -210,10 +203,8 @@ new CronJob('0 45 * * * *', function () { // Every hour, yes it has 6 dots, most
         return
       }
       data.forEach(function (elm) {
-        // Showing username
-        console.log(elm.display_name)
-        // Refreshing token
-        var authOptions = {
+        console.log(elm.display_name) // Showing username
+        var authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
           headers: { 'Authorization': 'Basic ' + bufferAuth },
           form: {
@@ -241,8 +232,8 @@ new CronJob('0 45 * * * *', function () { // Every hour, yes it has 6 dots, most
 }, null, true, 'America/Los_Angeles')
 
 // Mongoose deprecations // https://mongoosejs.com/docs/deprecations.html
-mongoose.set('useNewUrlParser', true)
 mongoose.set('useFindAndModify', false)
+mongoose.set('useNewUrlParser', true)
 mongoose.set('useCreateIndex', true)
 
 var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
@@ -256,6 +247,5 @@ mongoose.connect(DATABASE_URL)
     console.log('Listening on 8888')
   }))
   .catch((error) => {
-    console.log('Error at server startup')
-    console.error(error)
+    console.error('Error at server startup', error)
   })

@@ -4,34 +4,34 @@ stages:
   - deploy
 
 variables:
-  PROJECT_NAME: spotify
-  USER_EMAIL: luis@marroquin.dev
+  PRO_NAME: spotify
+  MY_EMAIL: luis@marroquin.dev
   FULL_URL: spotify.marroquin.dev
   PORT_EXP_CI: 8081
   PORT_APP_CI: 8888
 
-deploy:
+.variables_master: &master_variables
   stage: deploy
-  script:
-    - echo 'Deploying' ${CI_COMMIT_REF_NAME}
-    - docker-compose --project-name ${PROJECT_NAME}_master up -d --build --force-recreate --remove-orphans
-  environment:
-    name: Production
-    url: https://${FULL_URL}
   only:
     - master
   tags:
     - production
 
+deploy:
+  <<: *master_variables
+  script:
+    - echo 'Deploying' ${CI_COMMIT_REF_NAME}
+    - docker-compose --project-name ${PRO_NAME}_master up -d --build --force-recreate --remove-orphans
+  environment:
+    name: Production
+    url: https://${FULL_URL}
+
 stop:
-  stage: deploy
+  <<: *master_variables
   when: manual
   script:
     - echo 'Stopping' ${CI_COMMIT_REF_NAME}
-    - docker-compose --project-name ${PROJECT_NAME}_master stop
+    - docker-compose --project-name ${PRO_NAME}_master stop
   environment:
     name: Production
-  only:
-    - master
-  tags:
-    - production
+

@@ -22,7 +22,7 @@ services:
       # Nginx SSL Proxy
       VIRTUAL_HOST: ${FULL_URL}
       LETSENCRYPT_HOST: ${FULL_URL}
-      LETSENCRYPT_EMAIL: ${USER_EMAIL}
+      LETSENCRYPT_EMAIL: ${MY_EMAIL}
     networks:
       - external
       - internal
@@ -50,7 +50,7 @@ services:
       ME_CONFIG_SITE_COOKIESECRET: ad3s585f46radxfh23424w
       ME_CONFIG_SITE_SESSIONSECRET: qrd2diosl3adh2334xf7kl
       # Nginx SSL Proxy
-      LETSENCRYPT_EMAIL: ${USER_EMAIL}
+      LETSENCRYPT_EMAIL: ${MY_EMAIL}
       LETSENCRYPT_HOST: db.${FULL_URL}
       VIRTUAL_HOST: db.${FULL_URL}
     image: mongo-express:latest

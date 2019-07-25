@@ -1,9 +1,13 @@
 **/*.md
-**/.git
 **/*.yml
-**/.vscode
 **/.DS_Store
 **/Dockerfile
 **/.directory
 **/desktop.ini
+
+# Folders
+**/.git
+**/.vscode
+**/.github
+**/.gitlab
 **/node_modules

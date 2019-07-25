@@ -1,12 +1,16 @@
 {
   "editor.tabSize": 2,
   "search.exclude": {
+    "**/public/bootstrap.min.css": true,
+    "**/public/handlebars.min.js": true,
+    "**/public/jquery.min.js": true,
     "**/package-lock.json": true,
     "**/yarn.lock": true
   },
   "files.exclude": {
-    "**/.DS_store": true,
+    "**/desktop.ini": true,
     "**/.directory": true,
-    "**/desktop.ini": true
-  }
+    "**/.DS_Store": true
+  },
+  "explorer.openEditors.visible": 6
 }
