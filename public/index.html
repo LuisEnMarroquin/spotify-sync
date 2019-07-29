@@ -2,14 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Example of the Authorization Code flow with Spotify</title>
-    <link rel="stylesheet" href="bootstrap.min.css" async>
+    <title>Spotify Listening History</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" async>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="Description" content="An app to save Spotify play history.">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <style type="text/css">
       #login, #loggedin { display: none; }
+      .text-center { align-items: center; text-align: center; }
       .text-overflow { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin: 10px; }
     </style>
   </head>
@@ -23,34 +24,34 @@
       <div id="loggedin">
         <div id="user-profile"></div>
         <div id="oauth"></div>
-        <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
-        <button class="btn btn-default" id="obtain-last-50">Get last 50 played songs</button>
+        <div class='text-center'>
+          <button class="btn btn-success" id="obtain-new-token">Obtain new token using the refresh token</button>
+          <button class="btn btn-success" id="obtain-last-50">Get last 50 played songs</button>
+        </div>
       </div>
     </div>
 
     <script id="user-profile-template" type="text/x-handlebars-template">
       <h1>Logged in as {{display_name}}</h1>
-      <div class="media">
-        <div class="pull-left">
-          <img class="media-object" width="150" src="{{images.0.url}}" alt='' />
-        </div>
-        <div class="media-body">
-          <dl class="dl-horizontal">
+      <ul class="list-unstyled">
+        <li class="media">
+          <img class="mr-3" width="150" src="{{images.0.url}}" alt='' />
+          <div class="media-body">
             <dt style='padding-top: 3px;'>Display name</dt>
-            <dd style='padding-top: 3px;' class="clearfix">{{display_name}}</dd>
+            <dd style='padding-top: 2px;' class="clearfix">{{display_name}}</dd>
             <dt style='padding-top: 3px;'>Id</dt>
-            <dd style='padding-top: 3px;'>{{id}}</dd>
+            <dd style='padding-top: 2px;'>{{id}}</dd>
             <dt style='padding-top: 3px;'>Email</dt>
-            <dd style='padding-top: 3px;'>{{email}}</dd>
+            <dd style='padding-top: 2px;'>{{email}}</dd>
             <dt style='padding-top: 3px;'>Spotify URI</dt>
-            <dd style='padding-top: 3px;'><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
+            <dd style='padding-top: 2px;'><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
             <dt style='padding-top: 3px;'>Link</dt>
-            <dd style='padding-top: 3px;'><a href="{{href}}">{{href}}</a></dd>
+            <dd style='padding-top: 2px;'><a href="{{href}}">{{href}}</a></dd>
             <dt style='padding-top: 3px;'>Country</dt>
-            <dd style='padding-top: 3px;'>{{country}}</dd>
-          </dl>
+            <dd style='padding-top: 2px;'>{{country}}</dd>
+          </div>
         </div>
-      </div>
+      </ul>
     </script>
 
     <script id="oauth-template" type="text/x-handlebars-template">
@@ -63,8 +64,8 @@
       </dl>
     </script>
 
-    <script src="handlebars.min.js"></script>
-    <script src="jquery.min.js"></script>
+    <script src="handlebars/handlebars.min.js"></script>
+    <script src="jquery/jquery.min.js"></script>
     <script>
       (function() {
 

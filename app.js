@@ -39,7 +39,12 @@ app.use(cors())
 app.use(helmet())
 app.use(compression())
 app.use(cookieParser())
+
+// Static files
 app.use(express.static(path.join(__dirname, '/public')))
+app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
+app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
+app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
 
 app.get('/login', function (req, res) {
   var state = generateRandomString(16)
