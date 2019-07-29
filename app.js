@@ -45,6 +45,7 @@ app.use(express.static(path.join(__dirname, '/public')))
 app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
 app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
 app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
+app.use('/underscore', express.static(`${__dirname}/node_modules/underscore`))
 
 app.get('/login', function (req, res) {
   var state = generateRandomString(16)
@@ -110,11 +111,7 @@ app.get('/callback', function (req, res) { // your application requests refresh 
         })
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' +
-          querystring.stringify({
-            access_token: accessToken,
-            refresh_token: refreshToken
-          }))
+        res.redirect('/#' + querystring.stringify({ access_token: accessToken }))
       } else {
         res.redirect('/#' + querystring.stringify({ error: 'invalid_token' }))
       }
@@ -255,8 +252,19 @@ mongoose.set('useCreateIndex', true)
 
 // // Update many
 // Tracks.updateMany({}, { user: 'v9vwcwisvvr7c811mudjsptlv' }).lean().exec()
-//   .then(tra => {
-//     console.log(tra)
+//   .then(tra => { console.log(tra) })
+//   .catch(err => { console.log('Error Users', err) })
+// Tracks.updateMany({}, { $unset: { explicit: "" } }, { multi: true }).lean().exec()
+//   .then(tra => { console.log(tra) })
+//   .catch(err => { console.log('Error Users', err) })
+// Tracks.updateMany({}, { $unset: { is_local: "" } }, { multi: true }).lean().exec()
+//   .then(tra => { console.log(tra) })
+//   .catch(err => { console.log('Error Users', err) })
+// Tracks.find({}).exec()
+//   .then(data => {
+//     data.forEach(i => {
+//       console.log(i.played_at)
+//     })
 //   })
 //   .catch(err => { console.log('Error Users', err) })
 

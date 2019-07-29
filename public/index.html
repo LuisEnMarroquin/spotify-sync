@@ -9,7 +9,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <style type="text/css">
+      dt { padding-top: 3px; }
+      dd { padding-top: 2px; }
+      .text-bold { font-weight: bold; }
       #login, #loggedin { display: none; }
+      .inline-block { display: inline-block; }
       .text-center { align-items: center; text-align: center; }
       .text-overflow { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin: 10px; }
     </style>
@@ -18,37 +22,38 @@
   <body>
     <div class="container">
       <div id="login">
-        <h1>Authorization Code flow</h1>
+        <h2>Authorization Code flow</h2>
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
         <div id="user-profile"></div>
         <div id="oauth"></div>
         <div class='text-center'>
-          <button class="btn btn-success" id="obtain-new-token">Obtain new token using the refresh token</button>
-          <button class="btn btn-success" id="obtain-last-50">Get last 50 played songs</button>
+          <!-- <button class="btn btn-success mt-1" id="obtain-new-token">Obtain new token using the refresh token</button> -->
+          <button class="btn btn-success mt-1" id="obtain-last-50">Get last 50 played songs</button>
         </div>
+        <div id='last-50'></div>
       </div>
     </div>
 
     <script id="user-profile-template" type="text/x-handlebars-template">
-      <h1>Logged in as {{display_name}}</h1>
+      <h2>Logged in as {{display_name}}</h2>
       <ul class="list-unstyled">
         <li class="media">
-          <img class="mr-3" width="150" src="{{images.0.url}}" alt='' />
+          <img style='display: block' class="mr-3" width="150" src="{{images.0.url}}" alt='' />
           <div class="media-body">
-            <dt style='padding-top: 3px;'>Display name</dt>
-            <dd style='padding-top: 2px;' class="clearfix">{{display_name}}</dd>
-            <dt style='padding-top: 3px;'>Id</dt>
-            <dd style='padding-top: 2px;'>{{id}}</dd>
-            <dt style='padding-top: 3px;'>Email</dt>
-            <dd style='padding-top: 2px;'>{{email}}</dd>
-            <dt style='padding-top: 3px;'>Spotify URI</dt>
-            <dd style='padding-top: 2px;'><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
-            <dt style='padding-top: 3px;'>Link</dt>
-            <dd style='padding-top: 2px;'><a href="{{href}}">{{href}}</a></dd>
-            <dt style='padding-top: 3px;'>Country</dt>
-            <dd style='padding-top: 2px;'>{{country}}</dd>
+            <dt>Display name</dt>
+            <dd class="clearfix">{{display_name}}</dd>
+            <dt>Id</dt>
+            <dd>{{id}}</dd>
+            <dt>Email</dt>
+            <dd>{{email}}</dd>
+            <dt>Spotify URI</dt>
+            <dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
+            <dt>Link</dt>
+            <dd><a href="{{href}}">{{href}}</a></dd>
+            <dt>Country</dt>
+            <dd>{{country}}</dd>
           </div>
         </div>
       </ul>
@@ -59,16 +64,35 @@
       <dl class="dl-horizontal">
         <dt>Access token</dt>
         <dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt>
-        <dd class="text-overflow">{{refresh_token}}</dd>
       </dl>
     </script>
 
+    <script id="last-50-template" type="text/x-handlebars-template">
+      <h2>Last 50</h2>
+      <div class='row' style='padding-bottom: 10px;'>
+        {{#each this}}
+          <div class="media col-12 col-lg-6" style='padding-top:5px;'>
+            <img class="mr-3" width="64" src="{{img}}" alt="image">
+            <div class="media-body">
+              <a href='{{url}}'>
+                <h5 class="mt-0">{{name}}</h5>
+              </a>
+              <div>
+                <span class='inline-block text-bold'>Name:</span>
+                <span class='inline-block'>{{name}}</span>
+              </div>
+            </div>
+          </div>
+          <!-- {{this}} -->
+        {{/each}}
+      </div>
+    </script>
+
     <script src="handlebars/handlebars.min.js"></script>
+    <script src="underscore/underscore-min.js"></script>
     <script src="jquery/jquery.min.js"></script>
     <script>
       (function() {
-
         /**
          * Obtains parameters from the hash of the URL
          * @return Object
@@ -76,40 +100,33 @@
         function getHashParams() {
           var hashParams = {}
           var e, r = /([^&;=]+)=?([^&;]*)/g, q = window.location.hash.substring(1)
-          while ( e = r.exec(q)) {
-             hashParams[e[1]] = decodeURIComponent(e[2])
-          }
+          while ( e = r.exec(q)) { hashParams[e[1]] = decodeURIComponent(e[2]) }
           return hashParams
         }
 
-        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-            userProfileTemplate = Handlebars.compile(userProfileSource),
-            userProfilePlaceholder = document.getElementById('user-profile')
+        var userProfile1 = document.getElementById('user-profile-template').innerHTML,
+            userProfile2 = Handlebars.compile(userProfile1),
+            userProfile3 = document.getElementById('user-profile')
 
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth')
+        var oauthSource1 = document.getElementById('oauth-template').innerHTML,
+            oauthSource2 = Handlebars.compile(oauthSource1),
+            oauthSource3 = document.getElementById('oauth')
+        
+        var last50songs1 = document.getElementById('last-50-template').innerHTML,
+            last50songs2 = Handlebars.compile(last50songs1),
+            last50songs3 = document.getElementById('last-50')
 
-        var params = getHashParams()
+        var params = getHashParams(), access_token = params.access_token
 
-        var access_token = params.access_token,
-            refresh_token = params.refresh_token
-
-        if (params.error) {
-          alert('There was an error during the authentication')
-        } else {
+        if (params.error) alert('There was an error during the authentication')
+        else {
           if (access_token) {
-            // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token,
-              refresh_token
-            })
-
+            oauthSource3.innerHTML = oauthSource2({ access_token }) // render oauth info
             $.ajax({
                 url: 'https://api.spotify.com/v1/me',
                 headers: { 'Authorization': 'Bearer ' + access_token },
                 success: function(response) {
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response)
+                  userProfile3.innerHTML = userProfile2(response)
                   $('#login').hide()
                   $('#loggedin').show()
                 }
@@ -124,28 +141,38 @@
             $('#loggedin').hide()
           }
 
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: { refresh_token }
-            }).done(function(data) {
-              access_token = data.access_token
-              oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token,
-                refresh_token
-              })
-            })
-          }, false)
-
           document.getElementById('obtain-last-50').addEventListener('click', function() {
             $.ajax({
               url: '/last_played',
-              data: {
-                access_token,
-                refresh_token
-              }
+              data: { access_token }
             }).done(function(data) {
-              console.log(data.body.items)
+              // Declare empty array
+              var array = []
+              // Iterate
+              data.body.items.forEach(el => {
+                // Define clean object
+                var obj = {}
+                // Set props
+                if (_.has(el, "played_at")) { obj.played_at = el.played_at } else obj.played_at = 'Undefined'
+                if (_.has(el.track, "name")) { obj.name = el.track.name } else obj.name = 'Undefined'
+                // Create url
+                if (_.has(el.track, "uri")) {
+                  obj.uri = el.track.uri
+                  var url = obj.uri.split(":")
+                  obj.url = 'https://open.spotify.com/' + url[1] + '/' + url[2]
+                } else obj.uri = 'Undefined'
+                // Set image
+                if (_.has(el.track.album, "images")){
+                  if (el.track.album.images.length !== 0) obj.img = el.track.album.images[el.track.album.images.length -1].url
+                  else obj.img = 'favicon-32x32.png'
+                } else obj.img = 'favicon-32x32.png'
+                // Push to array
+                array.push(obj)
+              })
+              // Sorting newest to oldest
+              array = _.sortBy(array, function(objeto){ return !objeto.played_at })
+              // Add to view
+              last50songs3.innerHTML = last50songs2(array)
             })
           }, false)
 

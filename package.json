@@ -20,7 +20,8 @@
     "helmet": "^3.20.0",
     "jquery": "^3.4.1",
     "mongoose": "^5.5.7",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "underscore": "^1.9.1"
   },
   "standard": {
     "ignore": [

@@ -1,8 +1,8 @@
 **/*.md
 **/*.yml
 **/.DS_Store
-**/Dockerfile
 **/.directory
+**/Dockerfile
 **/desktop.ini
 
 # Folders
