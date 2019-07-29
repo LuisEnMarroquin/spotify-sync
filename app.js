@@ -248,11 +248,12 @@ mongoose.set('useFindAndModify', false)
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useCreateIndex', true)
 
-Tracks.updateMany({}, { user: 'v9vwcwisvvr7c811mudjsptlv' }).lean().exec()
-  .then(tra => {
-    console.log(tra)
-  })
-  .catch(err => { console.log('Error Users', err) })
+// // Update many
+// Tracks.updateMany({}, { user: 'v9vwcwisvvr7c811mudjsptlv' }).lean().exec()
+//   .then(tra => {
+//     console.log(tra)
+//   })
+//   .catch(err => { console.log('Error Users', err) })
 
 var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
 
