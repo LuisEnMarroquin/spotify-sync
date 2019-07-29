@@ -21,10 +21,8 @@
         <a href="/login" class="btn btn-primary">Log in with Spotify</a>
       </div>
       <div id="loggedin">
-        <div id="user-profile">
-        </div>
-        <div id="oauth">
-        </div>
+        <div id="user-profile"></div>
+        <div id="oauth"></div>
         <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
         <button class="btn btn-default" id="obtain-last-50">Get last 50 played songs</button>
       </div>
@@ -38,13 +36,18 @@
         </div>
         <div class="media-body">
           <dl class="dl-horizontal">
-            <dt>Display name</dt><dd class="clearfix">{{display_name}}</dd>
-            <dt>Id</dt><dd>{{id}}</dd>
-            <dt>Email</dt><dd>{{email}}</dd>
-            <dt>Spotify URI</dt><dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
-            <dt>Link</dt><dd><a href="{{href}}">{{href}}</a></dd>
-            <dt>Profile Image</dt><dd class="clearfix"><a href="{{images.0.url}}">{{images.0.url}}</a></dd>
-            <dt>Country</dt><dd>{{country}}</dd>
+            <dt style='padding-top: 3px;'>Display name</dt>
+            <dd style='padding-top: 3px;' class="clearfix">{{display_name}}</dd>
+            <dt style='padding-top: 3px;'>Id</dt>
+            <dd style='padding-top: 3px;'>{{id}}</dd>
+            <dt style='padding-top: 3px;'>Email</dt>
+            <dd style='padding-top: 3px;'>{{email}}</dd>
+            <dt style='padding-top: 3px;'>Spotify URI</dt>
+            <dd style='padding-top: 3px;'><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
+            <dt style='padding-top: 3px;'>Link</dt>
+            <dd style='padding-top: 3px;'><a href="{{href}}">{{href}}</a></dd>
+            <dt style='padding-top: 3px;'>Country</dt>
+            <dd style='padding-top: 3px;'>{{country}}</dd>
           </dl>
         </div>
       </div>
@@ -53,8 +56,10 @@
     <script id="oauth-template" type="text/x-handlebars-template">
       <h2>oAuth info</h2>
       <dl class="dl-horizontal">
-        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
+        <dt>Access token</dt>
+        <dd class="text-overflow">{{access_token}}</dd>
+        <dt>Refresh token</dt>
+        <dd class="text-overflow">{{refresh_token}}</dd>
       </dl>
     </script>
 
@@ -87,17 +92,16 @@
         var params = getHashParams()
 
         var access_token = params.access_token,
-            refresh_token = params.refresh_token,
-            error = params.error
+            refresh_token = params.refresh_token
 
-        if (error) {
+        if (params.error) {
           alert('There was an error during the authentication')
         } else {
           if (access_token) {
             // render oauth info
             oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
+              access_token,
+              refresh_token
             })
 
             $.ajax({
@@ -126,8 +130,8 @@
             }).done(function(data) {
               access_token = data.access_token
               oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token: access_token,
-                refresh_token: refresh_token
+                access_token,
+                refresh_token
               })
             })
           }, false)

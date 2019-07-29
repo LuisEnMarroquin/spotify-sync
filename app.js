@@ -138,7 +138,7 @@ app.get('/refresh_token', function (req, res) {
   })
 })
 
-var last50Tracks = function (options, res = false) { // Responding request
+var last50Tracks = function (options, user, res = false) { // Responding request
   console.log(new Date(Date.now()).toLocaleString())
   request.get(options, function (error, response, body) {
     if (!error && response.statusCode === 200) {
@@ -156,6 +156,7 @@ var last50Tracks = function (options, res = false) { // Responding request
 
       response.body.items.forEach(function (element) {
         try { // Deleting trash data
+          element.user = user
           if (element != null) {
             if (element.track != null) {
               if (element.track.explicit) delete element.track.explicit // If equals false won't be deleted
@@ -185,11 +186,22 @@ var last50Tracks = function (options, res = false) { // Responding request
 }
 
 app.get('/last_played', function (req, res) {
-  last50Tracks({
-    url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
-    headers: { 'Authorization': 'Bearer ' + req.query.access_token },
-    json: true
-  }, res)
+  Users.findOne({ accessToken: req.query.access_token }).lean().exec()
+    .then(data => {
+      if (!data) {
+        res.status(404).send('Please login again')
+        return
+      }
+      last50Tracks({
+        url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+        headers: { 'Authorization': 'Bearer ' + req.query.access_token },
+        json: true
+      }, data.id || 'Undefined', res)
+    })
+    .catch(err => {
+      res.status(500).send('Error interno del servidor')
+      console.log('Error getting last played', err)
+    })
 })
 
 // CronJob
@@ -203,7 +215,7 @@ new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 
         return
       }
       data.forEach(function (elm) {
-        console.log(elm.display_name) // Showing username
+        console.log(elm.display_name, elm.id) // Showing username
         var authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
           headers: { 'Authorization': 'Basic ' + bufferAuth },
@@ -221,7 +233,7 @@ new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 
               url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
               headers: { 'Authorization': 'Bearer ' + body.access_token },
               json: true
-            })
+            }, elm.id || 'Undefined')
           } else {
             console.log('Can not refresh token', error)
           }
@@ -235,6 +247,12 @@ new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 
 mongoose.set('useFindAndModify', false)
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useCreateIndex', true)
+
+Tracks.updateMany({}, { user: 'v9vwcwisvvr7c811mudjsptlv' }).lean().exec()
+  .then(tra => {
+    console.log(tra)
+  })
+  .catch(err => { console.log('Error Users', err) })
 
 var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
 
