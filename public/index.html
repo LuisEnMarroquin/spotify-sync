@@ -8,29 +8,61 @@
     <meta name="Description" content="An app to save Spotify play history.">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
       dt { padding-top: 3px; }
-      dd { padding-top: 2px; }
       .text-bold { font-weight: bold; }
-      #login, #loggedin { display: none; }
       .inline-block { display: inline-block; }
+      #login, #loggedin { display: none; }
       .text-center { align-items: center; text-align: center; }
-      .text-overflow { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin: 10px; }
+      dd { padding-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .content-center {
+        top: 40%;
+        position: absolute;
+        left: 50%;
+        z-index: 2;
+        -ms-transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #FFFFFF;
+        padding: 0 15px;
+        width: 100%;
+        max-width: 880px;
+      }
+      .page-header-image {
+        position: absolute;
+        background-size: cover;
+        background-position: center center;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
     </style>
   </head>
 
   <body>
-    <div class="container">
+    <div class="container-fluid p-0">
       <div id="login">
-        <h2>Authorization Code flow</h2>
-        <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+        <div class="page-header clear-filter" filter-color="orange">
+          <div class="page-header-image" data-parallax="true" style="background-image:url('./bg1.jpg');">
+          </div>
+          <div class="container">
+            <div class="content-center brand">
+              <img src="./now-logo.png" alt="" style='max-width: 100px; margin-bottom: 40px;'>
+              <h1 style='text-transform: uppercase; margin-bottom: 30px;'>Spotify Sync</h1>
+              <h3>Spotify playback history using Authorization Code Flow</h3>
+              <a href="/login" class="btn btn-primary btn-lg" style='margin-top: 30px;'>Log in with Spotify</a>
+            </div>
+          </div>
+        </div>
       </div>
       <div id="loggedin">
         <div id="user-profile"></div>
         <div id="oauth"></div>
         <div class='text-center'>
-          <!-- <button class="btn btn-success mt-1" id="obtain-new-token">Obtain new token using the refresh token</button> -->
-          <button class="btn btn-success mt-1" id="obtain-last-50">Get last 50 played songs</button>
+          <button class="btn btn-success mt-1" id="obtain-new-token">Obtain new token using the refresh token</button>
+          <button class="btn btn-success mt-1" id="obtain-last-50">Get last 50 songs</button>
         </div>
         <div id='last-50'></div>
       </div>
@@ -38,25 +70,23 @@
 
     <script id="user-profile-template" type="text/x-handlebars-template">
       <h2>Logged in as {{display_name}}</h2>
-      <ul class="list-unstyled">
-        <li class="media">
-          <img style='display: block' class="mr-3" width="150" src="{{images.0.url}}" alt='' />
-          <div class="media-body">
-            <dt>Display name</dt>
-            <dd class="clearfix">{{display_name}}</dd>
-            <dt>Id</dt>
-            <dd>{{id}}</dd>
-            <dt>Email</dt>
-            <dd>{{email}}</dd>
-            <dt>Spotify URI</dt>
-            <dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
-            <dt>Link</dt>
-            <dd><a href="{{href}}">{{href}}</a></dd>
-            <dt>Country</dt>
-            <dd>{{country}}</dd>
-          </div>
+      <div class="row">
+        <div class="col-12 col-md-3 text-center" style='padding-top: 5px;'>
+          <img width="70%" src="{{images.0.url}}" alt=''/>
         </div>
-      </ul>
+        <div class="col-12 col-md-9" style='padding-top: 5px;'>
+          <dt>Display name</dt>
+          <dd class="clearfix">{{display_name}} ({{country}})</dd>
+          <dt>Id</dt>
+          <dd>{{id}}</dd>
+          <dt>Email</dt>
+          <dd>{{email}}</dd>
+          <dt>Spotify URI</dt>
+          <dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
+          <dt>Link</dt>
+          <dd><a href="{{href}}">{{href}}</a></dd>
+        </div>
+      </div>
     </script>
 
     <script id="oauth-template" type="text/x-handlebars-template">
