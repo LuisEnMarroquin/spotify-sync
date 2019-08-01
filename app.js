@@ -6,8 +6,8 @@ var mongoose = require('mongoose') // MongoDB with schemas framework
 var express = require('express') // Express web server framework
 var request = require('request') // "Request" library
 const helmet = require('helmet')
+var { join } = require('path')
 var cors = require('cors')
-var path = require('path')
 
 // Models
 var Users = require('./models/users')
@@ -41,7 +41,7 @@ app.use(compression())
 app.use(cookieParser())
 
 // Static files
-app.use(express.static(path.join(__dirname, '/public')))
+app.use(express.static(join(__dirname, '/public')))
 app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
 app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
 app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
@@ -155,7 +155,6 @@ var last50Tracks = function (options, user, res = false) { // Responding request
       //     }
       //   } catch (err) { console.log(`Deletion error: ${err}`) }
       // })
-
       response.body.items.forEach(function (element) {
         try { // Deleting trash data
           element.user = user
@@ -179,7 +178,9 @@ var last50Tracks = function (options, user, res = false) { // Responding request
           })
           .catch(err => { console.log(err) })
       })
-      if (res) res.send(response) // Everything nice
+      if (res) {
+        res.send(response)
+      }
     } else {
       if (res) res.send(error)
       console.log('Error', error)
@@ -187,18 +188,27 @@ var last50Tracks = function (options, user, res = false) { // Responding request
   })
 }
 
+// Getting tracks from frontend
 app.get('/last_played', function (req, res) {
   Users.findOne({ accessToken: req.query.access_token }).lean().exec()
     .then(data => {
-      if (!data) {
-        res.status(404).send('Please login again')
-        return
-      }
+      if (!data) return res.status(404).send('Please login again')
       last50Tracks({
         url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
         headers: { 'Authorization': 'Bearer ' + req.query.access_token },
         json: true
       }, data.id || 'Undefined', res)
+    })
+    .catch(err => {
+      res.status(500).send('Error interno del servidor')
+      console.log('Error getting last played', err)
+    })
+})
+app.get('/my_history', function (req, res) {
+  Users.findOne({ accessToken: req.query.access_token }).lean().exec()
+    .then(data => {
+      if (!data) return res.status(404).send('Please login again')
+      console.log('dddd', data)
     })
     .catch(err => {
       res.status(500).send('Error interno del servidor')

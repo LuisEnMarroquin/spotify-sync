@@ -24,9 +24,10 @@
     "underscore": "^1.9.1"
   },
   "standard": {
-    "ignore": [
-      "/public/handlebars.min.js",
-      "/public/jquery.min.js"
+    "globals": [
+      "$",
+      "alert",
+      "Handlebars"
     ]
   },
   "nodemonConfig": {

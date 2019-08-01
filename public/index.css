@@ -1,0 +1,59 @@
+#login, #loggedin { /* By default hide both */
+  display: none;
+}
+
+dt {
+  padding-top: 3px;
+}
+
+dd {
+  overflow: hidden;
+  padding-top: 2px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.text-center {
+  text-align: center;
+  align-items: center;
+}
+
+.pt-common {
+  padding-top: 10px;
+}
+
+.content-center {
+  top: 40%;
+  left: 50%;
+  z-index: 2;
+  width: 100%;
+  padding: 0 15px;
+  color: #FFFFFF;
+  max-width: 880px;
+  position: absolute;
+  text-align: center;
+  -ms-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.page-header-image {
+  width: 100%;
+  z-index: -1;
+  height: 100%;
+  position: absolute;
+  background-size: cover;
+  background-position: center center;
+}
