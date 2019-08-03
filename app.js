@@ -213,7 +213,8 @@ app.get('/my_history', async function (req, res) {
   var limit = 30
   if (pagination > 1) skip = (pagination * limit) - limit
   // Handling headers
-  if (!req.headers.access_token) return res.status(404).send('Send me a valid access_token', req.headers) // Aditional param is required
+  console.log(req.headers)
+  if (!req.headers.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
   // Getting user
   var user = await Users.findOne({ accessToken: req.headers.access_token }, 'id -_id').lean().exec() // Getting user id from DB
   if (!user) return res.status(404).send('Please login again') // Your access token has probably expired
