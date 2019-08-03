@@ -1,13 +1,14 @@
-var cookieParser = require('cookie-parser')
-var querystring = require('querystring')
-var compression = require('compression') // Compress public folder
-var CronJob = require('cron').CronJob
-var mongoose = require('mongoose') // MongoDB with schemas framework
-var express = require('express') // Express web server framework
-var request = require('request') // "Request" library
+const cookieParser = require('cookie-parser')
+const querystring = require('querystring')
+const compression = require('compression') // Compress public folder
+const CronJob = require('cron').CronJob
+const mongoose = require('mongoose') // MongoDB with schemas framework
+const express = require('express') // Express web server framework
+const request = require('request') // "Request" library
 const helmet = require('helmet')
-var { join } = require('path')
-var cors = require('cors')
+const { join } = require('path')
+const _ = require('underscore')
+const cors = require('cors')
 
 // Models
 var Users = require('./models/users')
@@ -132,11 +133,8 @@ app.get('/refresh_token', function (req, res) {
   }
 
   request.post(authOptions, function (error, response, body) {
-    if (!error && response.statusCode === 200) {
-      res.send({
-        'access_token': body.access_token
-      })
-    }
+    if (!error && response.statusCode === 200) res.status(200).send({ 'access_token': body.access_token })
+    else res.status(500).send({ 'message': 'Can\'t refresh your token' })
   })
 })
 
@@ -146,7 +144,7 @@ var last50Tracks = function (options, user, res = false) { // Responding request
     if (!error && response.statusCode === 200) {
       // Enter new data
       // response.body.items = [
-      //   {"_id":{ "$oid": "5cd9ef044a24c1649ea570bd" },"played_at":"2019-05-13T18:42:03.843Z","context":{"uri":"spotify:playlist:37i9dQZF1DZ06evO46wsnu","external_urls":{"spotify":"https://open.spotify.com/playlist/37i9dQZF1DZ06evO46wsnu"},"href":"https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO46wsnu","type":"playlist"},"createdAt":"2019-05-13T22:26:12.580Z","track":{"album":{"album_type":"album","artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"external_urls":{"spotify":"https://open.spotify.com/album/2Gq0ERke26yxdGuRvrqFTD"},"href":"https://api.spotify.com/v1/albums/2Gq0ERke26yxdGuRvrqFTD","id":"2Gq0ERke26yxdGuRvrqFTD","images":[{"height":640,"url":"https://i.scdn.co/image/d2046d9cc60a6d13d31e352c15b34a7f828c7556","width":640},{"height":300,"url":"https://i.scdn.co/image/25426703fa7efbb6a80d752e5cfaa074c76fd3ed","width":300},{"height":64,"url":"https://i.scdn.co/image/93361c25eb95d226b5f0324b3fb4704934e05645","width":64}],"name":"Endgame","release_date":"2011-01-01","release_date_precision":"day","total_tracks":12,"type":"album","uri":"spotify:album:2Gq0ERke26yxdGuRvrqFTD"},"artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"disc_number":1,"duration_ms":239893,"explicit":false,"external_ids":{"isrc":"USUM71101044"},"external_urls":{"spotify":"https://open.spotify.com/track/6z38xRV0gxWMyjtuz5T2Ea"},"href":"https://api.spotify.com/v1/tracks/6z38xRV0gxWMyjtuz5T2Ea","id":"6z38xRV0gxWMyjtuz5T2Ea","is_local":false,"name":"Survivor Guilt","popularity":49,"preview_url":"https://p.scdn.co/mp3-preview/36e69e5a62dab3283ab495ada420ba252147b84b?cid=88f6696309ca49ada0261312613bcac0","track_number":7,"type":"track","uri":"spotify:track:6z38xRV0gxWMyjtuz5T2Ea"},"updatedAt":"2019-05-14T03:03:43.019Z"},
+      //   {"_id":{ "$oid": "5cd9ef044a24c1649ea570bd" },"played_at":"2019-05-13T18:42:03.843Z","context":{"uri":"spotify:playlist:37i9dQZF1DZ06evO46wsnu","external_urls":{"spotify":"https://open.spotify.com/playlist/37i9dQZF1DZ06evO46wsnu"},"href":"https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO46wsnu","type":"playlist"},"createdAt":"2019-05-13T22:26:12.580Z","track":{"album":{"album_type":"album","artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"external_urls":{"spotify":"https://open.spotify.com/album/2Gq0ERke26yxdGuRvrqFTD"},"href":"https://api.spotify.com/v1/albums/2Gq0ERke26yxdGuRvrqFTD","id":"2Gq0ERke26yxdGuRvrqFTD","images":[{"height":640,"url":"https://i.scdn.co/image/d2046d9cc60a6d13d31e352c15b34a7f828c7556","width":640},{"height":300,"url":"https://i.scdn.co/image/25426703fa7efbb6a80d752e5cfaa074c76fd3ed","width":300},{"height":64,"url":"https://i.scdn.co/image/93361c25eb95d226b5f0324b3fb4704934e05645","width":64}],"name":"Endgame","release_date":"2011-01-01","release_date_precision":"day","total_tracks":12,"type":"album","uri":"spotify:album:2Gq0ERke26yxdGuRvrqFTD"},"artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"disc_number":1,"duration_ms":239893,"explicit":false,"external_ids":{"isrc":"USUM71111144"},"external_urls":{"spotify":"https://open.spotify.com/track/6z38xRV0gxWMyjtuz5T2Ea"},"href":"https://api.spotify.com/v1/tracks/6z38xRV0gxWMyjtuz5T2Ea","id":"6z38xRV0gxWMyjtuz5T2Ea","is_local":false,"name":"Survivor Guilt","popularity":49,"preview_url":"https://p.scdn.co/mp3-preview/36e69e5a62dab3283ab495ada420ba252147b84b?cid=88f6696309ca49ada0261312613bcac0","track_number":7,"type":"track","uri":"spotify:track:6z38xRV0gxWMyjtuz5T2Ea"},"updatedAt":"2019-05-14T03:03:43.019Z"},
       // ]
       // response.body.items.forEach(function (element) {
       //   try { // Deleting trash data
@@ -204,16 +202,61 @@ app.get('/last_played', function (req, res) {
       console.log('Error getting last played', err)
     })
 })
-app.get('/my_history', function (req, res) {
-  Users.findOne({ accessToken: req.query.access_token }).lean().exec()
-    .then(data => {
-      if (!data) return res.status(404).send('Please login again')
-      console.log('dddd', data)
-    })
-    .catch(err => {
-      res.status(500).send('Error interno del servidor')
-      console.log('Error getting last played', err)
-    })
+app.get('/my_history', async function (req, res) {
+  // Handling query
+  if (!req.query.page) return res.status(404).send('Send me a valid page') // Aditional param is required
+  var pagination = Number(req.query.page)
+  if (isNaN(pagination)) return res.status(404).send('Your page is not a number') // Aditional param is required
+  pagination = Math.round(pagination)
+  if (pagination < 1) pagination = 1
+  var skip = 0
+  var limit = 30
+  if (pagination > 1) skip = (pagination * limit) - limit
+  // Handling headers
+  if (!req.headers.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
+  // Getting user
+  var user = await Users.findOne({ accessToken: req.headers.access_token }, 'id -_id').lean().exec() // Getting user id from DB
+  if (!user) return res.status(404).send('Please login again') // Your access token has probably expired
+  if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
+  // Getting tracks && documents length
+  var filter = { user: user.id }
+  var music = await Tracks.find(filter, '-createdAt -updatedAt', { skip, limit, sort: { played_at: -1 } }).lean().exec()
+  if (!music) return res.status(404).send('You have no music') // No music with your id
+  var count = await Tracks.countDocuments(filter).lean().exec()
+  // Declare empty array
+  var body = []
+  // Iterate
+  music.forEach(el => {
+    // Define clean object
+    var obj = {}
+    // played at
+    try { obj.played_at = el.played_at } catch (error) { obj.played_at = 'Undefined' }
+    // track name
+    try { obj.name = el.track.name } catch (error) { obj.name = 'Undefined' }
+    // url
+    try {
+      var url = el.track.uri.split(':')
+      obj.url = 'https://open.spotify.com/' + url[1] + '/' + url[2]
+    } catch (error) { obj.uri = 'Undefined' }
+    // artist
+    try {
+      var str = ''
+      for (let i = 0; i < el.track.artists.length; i++) {
+        str += el.track.artists[i].name
+        if (i + 1 !== el.track.artists.length) str += ', '
+      }
+      obj.artist = str
+    } catch (error) { obj.artist = 'Undefined' }
+    // image
+    try { obj.img = el.track.album.images[el.track.album.images.length - 1].url } catch (error) { obj.img = 'favicon-32x32.png' }
+    // Push to array
+    body.push(obj)
+  })
+  // Sorting newest to oldest
+  body = _.sortBy(body, function (objeto) { return !objeto.played_at })
+
+  // Send response
+  res.status(200).send({ count, body })
 })
 
 // CronJob

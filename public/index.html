@@ -32,41 +32,39 @@
 
       <div id="loggedin">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <div class="navbar-brand">Spotify Sync</div>
+          <div class="navbar-brand disable-select" id="obtain-last-50">Spotify Sync</div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <div class="nav-link pointer" id="obtain-usrData">My user data</div>
+                <div class="nav-link pointer" id="perfil-obtain">My user data</div>
               </li>
               <li class="nav-item">
-                <div class="nav-link pointer" id="obtain-last-50">Get last 50 songs</div>
+                <div class="nav-link pointer" id="played-obtain">My full history</div>
               </li>
               <li class="nav-item">
-                <div class="nav-link pointer" id="obtain-history">My full history</div>
+                <div class="nav-link pointer" id="logout-obtain">Sign Out</div>
               </li>
             </ul>
           </div>
         </nav>
         <div class="container pt-common">
-          <div id="user-profile"></div>
-          <div id='last-50'></div>
+          <div id="perfil"></div>
+          <div id='played'></div>
         </div>
       </div>
 
     </div>
 
-    <script id="user-profile-template" type="text/x-handlebars-template">
-      <h2>Logged in as {{display_name}}</h2>
-      <div class="row">
-        <div class="col-12 col-md-3 text-center pt-common">
-          <img width="70%" src="{{images.0.url}}" alt=''/>
+    <script id="perfil-template" type="text/x-handlebars-template">
+      <h3 class="text-center">Logged in as {{display_name}} ({{country}})</h3>
+      <div class="row" style='padding-top: 5px;'>
+        <div class="col-12 col-md-3 my-auto pt-common text-center">
+          <img width="70%" alt='' src="{{images.0.url}}"/>
         </div>
-        <div class="col-12 col-md-9 pt-common">
-          <dt>Display name</dt>
-          <dd class="clearfix">{{display_name}} ({{country}})</dd>
+        <div class="col-12 col-md-9 my-auto pt-common">
           <dt>Id</dt>
           <dd>{{id}}</dd>
           <dt>Email</dt>
@@ -77,29 +75,51 @@
       </div>
     </script>
 
-    <script id="last-50-template" type="text/x-handlebars-template">
-      <h2>Last 50</h2>
+    <script id="played-template" type="text/x-handlebars-template">
+      <h3 class="text-center pt-common">My full history ({{count}})</h3>
       <div class='row pt-common'>
-        {{#each this}}
-          <div class="media col-12 col-lg-6 pt-common">
-            <img class="mr-3" width="64" src="{{img}}" alt="image">
-            <div class="media-body">
-              <a href='{{url}}'>
-                <h5 class="mt-0">{{name}}</h5>
-              </a>
-              <div>
-                <span class='inline-block text-bold'>Name:</span>
-                <span class='inline-block'>{{name}}</span>
+        {{#each body}}
+          <div class="col-12 col-lg-6" style='padding-top: 15px;'>
+            <div class="card">
+              <div style="padding: 10px;">
+                <div class="media">
+                  <img class="mr-3" width="64" src="{{img}}" alt="image">
+                  <div class="media-body" style='text-overflow: ellipsis; white-space: nowrap; overflow: hidden;'>
+                    <a href='{{url}}'>
+                      <h5 class="mt-0">{{name}}</h5>
+                    </a>
+                    <div>
+                      <span class='inline-block text-bold'>Artists:</span>
+                      <span class='inline-block'>{{artist}}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         {{/each}}
       </div>
+
+      <div aria-label="Page navigation example" class="pt-common">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <div class="page-link pointer">Previous</div>
+          </li>
+          {{#each nav}}
+            <li class="page-item">
+              <div class="page-link pointer">{{this}}</div>
+            </li>
+          {{/each}}
+          <li class="page-item">
+            <div class="page-link pointer">Next</div>
+          </li>
+        </ul>
+      </div>
+
     </script>
 
-    <script src="handlebars/handlebars.min.js"></script>
-    <script src="underscore/underscore-min.js"></script>
     <script src="jquery/jquery.min.js"></script>
+    <script src="handlebars/handlebars.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="index.js"></script>
   </body>

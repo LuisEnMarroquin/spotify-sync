@@ -1,9 +1,6 @@
 {
   "editor.tabSize": 2,
   "search.exclude": {
-    "**/public/bootstrap.min.css": true,
-    "**/public/handlebars.min.js": true,
-    "**/public/jquery.min.js": true,
     "**/package-lock.json": true,
     "**/yarn.lock": true
   },

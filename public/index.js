@@ -1,11 +1,9 @@
 (function () {
-  var userProfile1 = document.getElementById('user-profile-template').innerHTML
-  var userProfile2 = Handlebars.compile(userProfile1)
-  var userProfile3 = document.getElementById('user-profile')
+  var userProfile1 = Handlebars.compile(document.getElementById('perfil-template').innerHTML)
+  var userProfile2 = document.getElementById('perfil')
 
-  var last50songs1 = document.getElementById('last-50-template').innerHTML
-  var last50songs2 = Handlebars.compile(last50songs1)
-  var last50songs3 = document.getElementById('last-50')
+  var playedSongs1 = Handlebars.compile(document.getElementById('played-template').innerHTML)
+  var playedSongs2 = document.getElementById('played')
 
   function getHashParams () { // Obtains parameters from the hash of the URL
     var hashParams = {}
@@ -20,16 +18,16 @@
     $('#loggedin').hide()
   }
 
-  var params = getHashParams(); var access_token = params.access_token
+  var params = getHashParams()
 
   if (params.error) alert('There was an error during the authentication')
   else {
-    if (access_token) {
+    if (params.access_token) {
       $.ajax({
         url: 'https://api.spotify.com/v1/me',
-        headers: { 'Authorization': 'Bearer ' + access_token },
+        headers: { 'Authorization': 'Bearer ' + params.access_token },
         success: function (response) {
-          userProfile3.innerHTML = userProfile2(response)
+          userProfile2.innerHTML = userProfile1(response)
           $('#login').hide()
           $('#loggedin').show()
         }
@@ -40,38 +38,37 @@
     } else logout() // Show initial screen if no access_token
 
     document.getElementById('obtain-last-50').addEventListener('click', function () {
-      $.ajax({
-        url: '/last_played',
-        data: { access_token }
-      }).done(function (data) {
-        // Declare empty array
-        var array = []
-        // Iterate
-        data.body.items.forEach(el => {
-          // Define clean object
-          var obj = {}
-          // Set props
-          if (_.has(el, 'played_at')) { obj.played_at = el.played_at } else obj.played_at = 'Undefined'
-          if (_.has(el.track, 'name')) { obj.name = el.track.name } else obj.name = 'Undefined'
-          // Create url
-          if (_.has(el.track, 'uri')) {
-            obj.uri = el.track.uri
-            var url = obj.uri.split(':')
-            obj.url = 'https://open.spotify.com/' + url[1] + '/' + url[2]
-          } else obj.uri = 'Undefined'
-          // Set image
-          if (_.has(el.track.album, 'images')) {
-            if (el.track.album.images.length !== 0) obj.img = el.track.album.images[el.track.album.images.length - 1].url
-            else obj.img = 'favicon-32x32.png'
-          } else obj.img = 'favicon-32x32.png'
-          // Push to array
-          array.push(obj)
+      $.ajax({ url: '/last_played', data: { access_token: params.access_token } })
+        .done(function (data) {
+          console.log(data)
         })
-        // Sorting newest to oldest
-        array = _.sortBy(array, function (objeto) { return !objeto.played_at })
-        // Add to view
-        last50songs3.innerHTML = last50songs2(array)
+    }, false)
+
+    document.getElementById('perfil-obtain').addEventListener('click', function () {
+      // Hide SPA
+      $('#perfil').show()
+      $('#played').hide()
+    }, false)
+
+    document.getElementById('played-obtain').addEventListener('click', function () {
+      $.ajax({
+        url: '/my_history',
+        data: { page: 1 },
+        headers: { access_token: params.access_token }
+      }).done(function (data) {
+        data.nav = []
+        var navigation = Math.ceil(data.count / 30)
+        for (var i = 0; i < navigation; i++) { data.nav.push(i + 1) }
+        console.log(data)
+        playedSongs2.innerHTML = playedSongs1(data)
+        // Hide SPA
+        $('#perfil').hide()
+        $('#played').show()
       })
+    }, false)
+
+    document.getElementById('logout-obtain').addEventListener('click', function () {
+      logout()
     }, false)
   }
 })()
