@@ -203,7 +203,7 @@ app.get('/last_played', function (req, res) {
     })
 })
 app.get('/my_history', async function (req, res) {
-  // Handling query
+  // Handling query.page
   if (!req.query.page) return res.status(404).send('Send me a valid page') // Aditional param is required
   var pagination = Number(req.query.page)
   if (isNaN(pagination)) return res.status(404).send('Your page is not a number') // Aditional param is required
@@ -212,11 +212,10 @@ app.get('/my_history', async function (req, res) {
   var skip = 0
   var limit = 30
   if (pagination > 1) skip = (pagination * limit) - limit
-  // Handling headers
-  console.log(req.headers)
-  if (!req.headers.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
+  // Handling query.page.access_token
+  if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
   // Getting user
-  var user = await Users.findOne({ accessToken: req.headers.access_token }, 'id -_id').lean().exec() // Getting user id from DB
+  var user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
   if (!user) return res.status(404).send('Please login again') // Your access token has probably expired
   if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
   // Getting tracks && documents length

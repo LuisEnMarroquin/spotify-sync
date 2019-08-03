@@ -53,8 +53,7 @@
     document.getElementById('played-obtain').addEventListener('click', function () {
       $.ajax({
         url: '/my_history',
-        data: { page: 1 },
-        headers: { access_token: params.access_token }
+        data: { page: 1, access_token: params.access_token },
       }).done(function (data) {
         data.nav = []
         var navigation = Math.ceil(data.count / 30)
