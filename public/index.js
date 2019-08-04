@@ -31,13 +31,23 @@
       // Create nav array
       data.nav = []
       // Calculating navigation
-      navigation = Math.ceil(data.count / 30)
+      navigation = Math.ceil(data.count / 20) // NS = Same as app.js
       // Creating navigation array
-      for (var i = 0; i < navigation; i++) { // SHOULD BE THE SAME BUCLE
-        data.nav.push(i + 1)
+      if (navigation < 6) {
+        for (var i = 0; i < navigation; i++) {
+          data.nav.push(i + 1)
+        }
+      } else if (pagination === 1 || pagination === 2) {
+        data.nav = [1, 2, 3, 4, 5]
+      } else if (pagination === navigation - 1) {
+        data.nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
+      } else if (pagination === navigation) {
+        data.nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
+      } else { // Has the at least 2 options on both sides
+        data.nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2]
       }
       // Logging data
-      console.log(pagination, data)
+      console.log(pagination, navigation, data)
       // Create view
       playedSongs2.innerHTML = playedSongs1(data)
       // Remove 'active' class
@@ -57,12 +67,12 @@
         else getHistory(pagination)
       }, false)
       // Adding event listenner to pagination content
-      for (var o = 0; o < navigation; o++) { // SHOULD BE THE SAME BUCLE
-        document.getElementById('pg-' + (o + 1)).addEventListener('click', function () {
+      data.nav.forEach(function (navNumber) {
+        document.getElementById('pg-' + navNumber).addEventListener('click', function () {
           var pageNumber = Number($(this).children().text())
           getHistory(pageNumber)
         })
-      }
+      })
     })
   }
 

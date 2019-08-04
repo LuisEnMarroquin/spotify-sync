@@ -7,7 +7,6 @@ const express = require('express') // Express web server framework
 const request = require('request') // "Request" library
 const helmet = require('helmet')
 const { join } = require('path')
-const _ = require('underscore')
 const cors = require('cors')
 
 // Models
@@ -47,7 +46,6 @@ app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`)
 app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
 app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
 app.use('/popper', express.static(`${__dirname}/node_modules/popper.js/dist/umd`))
-app.use('/underscore', express.static(`${__dirname}/node_modules/underscore`))
 
 app.get('/login', function (req, res) {
   var state = generateRandomString(16)
@@ -211,7 +209,7 @@ app.get('/my_history', async function (req, res) {
   pagination = Math.round(pagination)
   if (pagination < 1) pagination = 1
   var skip = 0
-  var limit = 30
+  var limit = 20 // NS = Same as index.js
   if (pagination > 1) skip = (pagination * limit) - limit
   // Handling query.page.access_token
   if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
@@ -253,9 +251,6 @@ app.get('/my_history', async function (req, res) {
     // Push to array
     body.push(obj)
   })
-  // Sorting newest to oldest
-  body = _.sortBy(body, function (objeto) { return !objeto.played_at })
-
   // Send response
   res.status(200).send({ count, body })
 })

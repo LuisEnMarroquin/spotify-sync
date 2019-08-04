@@ -77,9 +77,24 @@
 
     <script id="played-template" type="text/x-handlebars-template">
       <h3 class="text-center pt-common">My full history ({{count}})</h3>
-      <div class='row pt-common'>
+      <div aria-label="Page navigation example" style="padding-top: 15px;">
+        <ul class="pagination justify-content-center flex-wrap">
+          <li class="page-item" id='pagination-previous'>
+            <div class="page-link pointer disable-select text-bold"><</div>
+          </li>
+          {{#each nav}}
+            <li class="page-item pagination-number" id='pg-{{this}}'>
+              <div class="page-link pointer disable-select">{{this}}</div>
+            </li>
+          {{/each}}
+          <li class="page-item" id='pagination-next'>
+            <div class="page-link pointer disable-select text-bold">></div>
+          </li>
+        </ul>
+      </div>
+      <div class='row' style='padding-bottom: 5px;'>
         {{#each body}}
-          <div class="col-12 col-lg-6" style='padding-top: 15px;'>
+          <div class="col-12 col-lg-6" style='padding-top: 5px; padding-bottom: 5px;'>
             <div class="card">
               <div style="padding: 10px;">
                 <div class="media">
@@ -98,21 +113,6 @@
             </div>
           </div>
         {{/each}}
-      </div>
-      <div aria-label="Page navigation example" class="pt-common">
-        <ul class="pagination justify-content-center flex-wrap">
-          <li class="page-item" id='pagination-previous'>
-            <div class="page-link pointer disable-select text-bold"><</div>
-          </li>
-          {{#each nav}}
-            <li class="page-item pagination-number" id='pg-{{this}}'>
-              <div class="page-link pointer disable-select">{{this}}</div>
-            </li>
-          {{/each}}
-          <li class="page-item" id='pagination-next'>
-            <div class="page-link pointer disable-select text-bold">></div>
-          </li>
-        </ul>
       </div>
     </script>
 

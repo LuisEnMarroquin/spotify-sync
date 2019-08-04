@@ -21,8 +21,7 @@
     "jquery": "^3.4.1",
     "mongoose": "^5.6.8",
     "popper.js": "^1.15.0",
-    "request": "^2.83.0",
-    "underscore": "^1.9.1"
+    "request": "^2.83.0"
   },
   "standard": {
     "globals": [
