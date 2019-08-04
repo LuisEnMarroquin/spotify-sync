@@ -18,6 +18,37 @@
     $('#loggedin').hide()
   }
 
+  function getHistory (page) {
+    $.ajax({
+      url: '/my_history',
+      data: { page, access_token: params.access_token }
+    }).done(function (data) {
+      // Create nav array
+      data.nav = []
+      // Calculating navigation
+      var navigation = Math.ceil(data.count / 30)
+      // Creating navigation array
+      for (var i = 0; i < navigation; i++) {
+        data.nav.push(i + 1)
+      }
+      // Logging data
+      console.log(data)
+      // Create view
+      playedSongs2.innerHTML = playedSongs1(data)
+      // Remove 'active' class
+      $('.pagination-number').removeClass('active')
+      // Adding 'active' class to active pagination
+      $('#pg-' + page).addClass('active')
+      // Adding event listenner to pagination content
+      for (var o = 0; o < navigation; o++) {
+        document.getElementById('pg-' + (o + 1)).addEventListener('click', function () {
+          var pageNumber = $(this).children().text()
+          getHistory(pageNumber)
+        })
+      }
+    })
+  }
+
   var params = getHashParams()
 
   if (params.error) alert('There was an error during the authentication')
@@ -51,23 +82,19 @@
     }, false)
 
     document.getElementById('played-obtain').addEventListener('click', function () {
-      $.ajax({
-        url: '/my_history',
-        data: { page: 1, access_token: params.access_token },
-      }).done(function (data) {
-        data.nav = []
-        var navigation = Math.ceil(data.count / 30)
-        for (var i = 0; i < navigation; i++) { data.nav.push(i + 1) }
-        console.log(data)
-        playedSongs2.innerHTML = playedSongs1(data)
-        // Hide SPA
-        $('#perfil').hide()
-        $('#played').show()
-      })
+      // Hide SPA
+      $('#perfil').hide()
+      $('#played').show()
+      // Get last played history
+      getHistory(1)
     }, false)
 
     document.getElementById('logout-obtain').addEventListener('click', function () {
       logout()
     }, false)
+
+    $('.nav-item').on('click', function () { // Close navbar on option select
+      $('.navbar-collapse').collapse('hide')
+    })
   }
 })()

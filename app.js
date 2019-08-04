@@ -46,7 +46,7 @@ app.use(express.static(join(__dirname, '/public')))
 app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
 app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
 app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
-// app.use('/popper', express.static(`${__dirname}/node_modules/popper/dist/umd`))
+app.use('/popper', express.static(`${__dirname}/node_modules/popper.js/dist/umd`))
 app.use('/underscore', express.static(`${__dirname}/node_modules/underscore`))
 
 app.get('/login', function (req, res) {

@@ -101,25 +101,25 @@
       </div>
 
       <div aria-label="Page navigation example" class="pt-common">
-        <ul class="pagination justify-content-center">
-          <li class="page-item">
+        <ul class="pagination justify-content-center flex-wrap">
+          <!-- <li class="page-item">
             <div class="page-link pointer">Previous</div>
-          </li>
+          </li> -->
           {{#each nav}}
-            <li class="page-item">
+            <li class="page-item pagination-number" id='pg-{{this}}'>
               <div class="page-link pointer">{{this}}</div>
             </li>
           {{/each}}
-          <li class="page-item">
+          <!-- <li class="page-item">
             <div class="page-link pointer">Next</div>
-          </li>
+          </li> -->
         </ul>
       </div>
 
     </script>
 
     <script src="jquery/jquery.min.js"></script>
-    <!-- <script src="popper/popper.min.js"></script> -->
+    <script src="popper/popper.min.js"></script>
     <script src="handlebars/handlebars.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="index.js"></script>
