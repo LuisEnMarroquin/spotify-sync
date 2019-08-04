@@ -221,7 +221,7 @@ app.get('/my_history', async function (req, res) {
   if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
   // Getting tracks && documents length
   var filter = { user: user.id }
-  var music = await Tracks.find(filter, '-createdAt -updatedAt', { skip, limit, sort: { played_at: -1 } }).lean().exec()
+  var music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
   if (!music) return res.status(404).send('You have no music') // No music with your id
   var count = await Tracks.countDocuments(filter).lean().exec()
   // Declare empty array

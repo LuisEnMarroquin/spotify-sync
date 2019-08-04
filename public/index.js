@@ -1,4 +1,7 @@
 (function () {
+  var pagination = 1
+  var navigation = 1
+
   var userProfile1 = Handlebars.compile(document.getElementById('perfil-template').innerHTML)
   var userProfile2 = document.getElementById('perfil')
 
@@ -23,26 +26,40 @@
       url: '/my_history',
       data: { page, access_token: params.access_token }
     }).done(function (data) {
+      // Change global pagination variable
+      pagination = page
       // Create nav array
       data.nav = []
       // Calculating navigation
-      var navigation = Math.ceil(data.count / 30)
+      navigation = Math.ceil(data.count / 30)
       // Creating navigation array
-      for (var i = 0; i < navigation; i++) {
+      for (var i = 0; i < navigation; i++) { // SHOULD BE THE SAME BUCLE
         data.nav.push(i + 1)
       }
       // Logging data
-      console.log(data)
+      console.log(pagination, data)
       // Create view
       playedSongs2.innerHTML = playedSongs1(data)
       // Remove 'active' class
       $('.pagination-number').removeClass('active')
       // Adding 'active' class to active pagination
-      $('#pg-' + page).addClass('active')
+      $('#pg-' + pagination).addClass('active')
+      // Pagination previous
+      document.getElementById('pagination-previous').addEventListener('click', function () {
+        pagination -= 1
+        if (pagination < 1) pagination = 1
+        else getHistory(pagination)
+      }, false)
+      // Pagination next
+      document.getElementById('pagination-next').addEventListener('click', function () {
+        pagination += 1
+        if (pagination > navigation) pagination = navigation
+        else getHistory(pagination)
+      }, false)
       // Adding event listenner to pagination content
-      for (var o = 0; o < navigation; o++) {
+      for (var o = 0; o < navigation; o++) { // SHOULD BE THE SAME BUCLE
         document.getElementById('pg-' + (o + 1)).addEventListener('click', function () {
-          var pageNumber = $(this).children().text()
+          var pageNumber = Number($(this).children().text())
           getHistory(pageNumber)
         })
       }
@@ -86,7 +103,7 @@
       $('#perfil').hide()
       $('#played').show()
       // Get last played history
-      getHistory(1)
+      getHistory(pagination)
     }, false)
 
     document.getElementById('logout-obtain').addEventListener('click', function () {
@@ -97,4 +114,14 @@
       $('.navbar-collapse').collapse('hide')
     })
   }
+
+  // if ('serviceWorker' in navigator) {
+  //   window.addEventListener('load', function () {
+  //     navigator.serviceWorker.register('/sw.js').then(function (registration) { // Registration was successful
+  //       console.log('ServiceWorker registration successful with scope:', registration.scope)
+  //     }, function (err) { // registration failed :(
+  //       console.log('ServiceWorker registration failed: ', err)
+  //     })
+  //   })
+  // }
 })()

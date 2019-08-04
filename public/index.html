@@ -84,7 +84,7 @@
               <div style="padding: 10px;">
                 <div class="media">
                   <img class="mr-3" width="64" src="{{img}}" alt="image">
-                  <div class="media-body" style='text-overflow: ellipsis; white-space: nowrap; overflow: hidden;'>
+                  <div class="media-body my-auto" style='text-overflow: ellipsis; white-space: nowrap; overflow: hidden;'>
                     <a href='{{url}}'>
                       <h5 class="mt-0">{{name}}</h5>
                     </a>
@@ -99,23 +99,21 @@
           </div>
         {{/each}}
       </div>
-
       <div aria-label="Page navigation example" class="pt-common">
         <ul class="pagination justify-content-center flex-wrap">
-          <!-- <li class="page-item">
-            <div class="page-link pointer">Previous</div>
-          </li> -->
+          <li class="page-item" id='pagination-previous'>
+            <div class="page-link pointer disable-select text-bold"><</div>
+          </li>
           {{#each nav}}
             <li class="page-item pagination-number" id='pg-{{this}}'>
-              <div class="page-link pointer">{{this}}</div>
+              <div class="page-link pointer disable-select">{{this}}</div>
             </li>
           {{/each}}
-          <!-- <li class="page-item">
-            <div class="page-link pointer">Next</div>
-          </li> -->
+          <li class="page-item" id='pagination-next'>
+            <div class="page-link pointer disable-select text-bold">></div>
+          </li>
         </ul>
       </div>
-
     </script>
 
     <script src="jquery/jquery.min.js"></script>

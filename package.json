@@ -27,7 +27,11 @@
   "standard": {
     "globals": [
       "$",
+      "self",
       "alert",
+      "cache",
+      "fetch",
+      "caches",
       "Handlebars"
     ]
   },
