@@ -18,6 +18,8 @@ services:
       - mongo
     environment:
       API_HOST: http://${FULL_URL:-localhost:8888}/callback
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
       DATABASE_URL: mongodb://mongo/spotify
       # Nginx SSL Proxy
       VIRTUAL_HOST: ${FULL_URL}

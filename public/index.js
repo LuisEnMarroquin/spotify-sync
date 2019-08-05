@@ -28,24 +28,8 @@
     }).done(function (data) {
       // Change global pagination variable
       pagination = page
-      // Create nav array
-      data.nav = []
-      // Calculating navigation
-      navigation = Math.ceil(data.count / 20) // NS = Same as app.js
-      // Creating navigation array
-      if (navigation < 6) {
-        for (var i = 0; i < navigation; i++) {
-          data.nav.push(i + 1)
-        }
-      } else if (pagination === 1 || pagination === 2) {
-        data.nav = [1, 2, 3, 4, 5]
-      } else if (pagination === navigation - 1) {
-        data.nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
-      } else if (pagination === navigation) {
-        data.nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
-      } else { // Has the at least 2 options on both sides
-        data.nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2]
-      }
+      // Change global navigation variable
+      navigation = data.navigation
       // Logging data
       console.log(pagination, navigation, data)
       // Create view
@@ -120,8 +104,10 @@
       logout()
     }, false)
 
-    $('.nav-item').on('click', function () { // Close navbar on option select
-      $('.navbar-collapse').collapse('hide')
+    $('.nav-item').on('click', function () {
+      $('.navbar-collapse').collapse('hide') // Close navbar on option select
+      $('.nav-link').removeClass('active') // Remove active class from all
+      $(this).children().addClass('active') // Add active class to clicked
     })
   }
 

@@ -8,6 +8,9 @@ const request = require('request') // "Request" library
 const helmet = require('helmet')
 const { join } = require('path')
 const cors = require('cors')
+require('dotenv').config()
+
+if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) console.log('Create an env file with your CLIENT_ID and CLIENT_SECRET')
 
 // Models
 var Users = require('./models/users')
@@ -15,10 +18,8 @@ var Tracks = require('./models/tracks')
 
 // Spotify Dashboard variables
 var stateKey = 'spotify_auth_state' // Which type of key
-var clientId = '88f6696309ca49ada0261312613bcac0' // Your client id
-var clientSecret = 'e55db49b5ff544a78fff96efd3b248c5' // Your secret
 var redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
-var bufferAuth = (Buffer.from(clientId + ':' + clientSecret).toString('base64'))
+var bufferAuth = (Buffer.from(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
 
 /**
  * Generates a random string containing numbers and letters
@@ -54,7 +55,7 @@ app.get('/login', function (req, res) {
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
-      client_id: clientId,
+      client_id: process.env.CLIENT_ID,
       scope: 'user-read-private user-read-email user-read-recently-played',
       redirect_uri: redirectUri,
       state: state
@@ -209,7 +210,7 @@ app.get('/my_history', async function (req, res) {
   pagination = Math.round(pagination)
   if (pagination < 1) pagination = 1
   var skip = 0
-  var limit = 20 // NS = Same as index.js
+  var limit = 20
   if (pagination > 1) skip = (pagination * limit) - limit
   // Handling query.page.access_token
   if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
@@ -221,7 +222,8 @@ app.get('/my_history', async function (req, res) {
   var filter = { user: user.id }
   var music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
   if (!music) return res.status(404).send('You have no music') // No music with your id
-  var count = await Tracks.countDocuments(filter).lean().exec()
+  var count = await Tracks.countDocuments(filter).lean().exec() // Counting songs number
+  if (!count) return res.status(500).send('Error counting your music')
   // Declare empty array
   var body = []
   // Iterate
@@ -251,8 +253,26 @@ app.get('/my_history', async function (req, res) {
     // Push to array
     body.push(obj)
   })
+  // Create nav array
+  var nav = []
+  // Calculating navigation
+  var navigation = Math.ceil(count / limit)
+  // Creating navigation array
+  if (navigation < 6) {
+    for (var i = 0; i < navigation; i++) {
+      nav.push(i + 1)
+    }
+  } else if (pagination === 1 || pagination === 2) {
+    nav = [1, 2, 3, 4, 5]
+  } else if (pagination === navigation - 1) {
+    nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
+  } else if (pagination === navigation) {
+    nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
+  } else { // Has the at least 2 options on both sides
+    nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2]
+  }
   // Send response
-  res.status(200).send({ count, body })
+  res.status(200).send({ count, body, nav, navigation })
 })
 
 // CronJob

@@ -6,7 +6,7 @@ This project contains basic demos showing the different OAuth 2.0 flows for [aut
 
 ## Installation
 
-These examples run on Node.js. On [its website](http://www.nodejs.org/download/) you can find instructions on how to install it. You can also follow [this gist](https://gist.github.com/isaacs/579814) for a quick and easy way to install Node.js and npm.
+These examples run on Node.js. On [its website](http://www.nodejs.org/download/) you can find instructions on how to install it.
 
 Once installed, clone the repository and install its dependencies running: `yarn`
 
@@ -18,12 +18,12 @@ To do so, go to [your Spotify for Developers Dashboard](https://beta.developer.s
 * http://localhost:8888 (needed for the implicit grant flow)
 * http://localhost:8888/callback
 
-Once you have created your app, replace the `client_id`, `redirect_uri` and `client_secret` in the examples with the ones you get from My Applications.
+Once you have created your app, replace the `CLIENT_ID` and `CLIENT_SECRET` in the examples with the ones you get from your Spotify Dashboard.
 
 ## Running the examples
 In order to run the different examples, open the folder with the name of the flow you want to try out, and run its `app.js` file. For instance, to run the Authorization Code example do:
 
-    $ cd authorization_code
+    $ cd spotify
     $ node app.js
 
 Then, open `http://localhost:8888` in a browser.
