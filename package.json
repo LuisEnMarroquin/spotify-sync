@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "nodemon app.js",
     "stop": "docker-compose --project-name spoty stop",
-    "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans"
+    "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans",
+    "mongoWindows": "docker volume create mongo && docker run -d --name mongo -p 27017:27017 -v mongo:/data/db mongo:latest",
+    "mongoUnix": "sudo docker run --rm -d --name mongo -p 27017:27017 -v ~/.docker/volumes/MongoDB/mongodb:/data/db mongo:latest"
   },
   "dependencies": {
     "bootstrap": "^4.3.1",
