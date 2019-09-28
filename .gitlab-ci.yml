@@ -5,33 +5,53 @@ stages:
 
 variables:
   PRO_NAME: spotify
+  MAIN_URL: marroquin.dev
   MY_EMAIL: luis@marroquin.dev
-  FULL_URL: spotify.marroquin.dev
-  PORT_EXP_CI: 8081
-  PORT_APP_CI: 8888
 
 .variables_master: &master_variables
+  variables:
+    FULL_URL: ${PRO_NAME}.${MAIN_URL}
   stage: deploy
   only:
     - master
   tags:
     - production
-
-deploy:
+deploy_master:
   <<: *master_variables
   script:
-    - echo 'Deploying' ${CI_COMMIT_REF_NAME}
-    - docker-compose --project-name ${PRO_NAME}_master up -d --build --force-recreate --remove-orphans
+    - docker-compose --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} up -d --build --force-recreate --remove-orphans
   environment:
-    name: Production
+    name: env_master
     url: https://${FULL_URL}
-
-stop:
+stop_master:
   <<: *master_variables
   when: manual
   script:
-    - echo 'Stopping' ${CI_COMMIT_REF_NAME}
-    - docker-compose --project-name ${PRO_NAME}_master stop
+    - docker-compose --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} stop
   environment:
-    name: Production
+    name: env_master
 
+.variables_dynamic: &dynamic_variables
+  variables:
+    FULL_URL: ${PRO_NAME}.${CI_COMMIT_REF_NAME}.${MAIN_URL}
+  stage: deploy
+  only:
+    - branches
+  except:
+    - master
+  tags:
+    - production
+deploy_dynamic:
+  <<: *dynamic_variables
+  script:
+    - docker-compose --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} up -d --build --force-recreate --remove-orphans
+  environment:
+    name: env_dynamic
+    url: https://${FULL_URL}
+stop_dynamic:
+  <<: *dynamic_variables
+  when: manual
+  script:
+    - docker-compose --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} stop
+  environment:
+    name: env_dynamic

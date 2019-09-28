@@ -11,17 +11,12 @@ You will need to register your app and get your own credentials from the Spotify
 * http://localhost:8888/callback
 Once you have created your app, create an `.env` file and add the `CLIENT_ID` and `CLIENT_SECRET` that you got from your Spotify Dashboard.
 
-# Run database
-MongoDB is needed to run or deploy this project. If you have Docker and depending on your OS you can use:
-```shell
-yarn mongoWindows
-yarn mongoUnix # Unix based: Linux or MacOS
-```
+## Run database
+MongoDB is needed to run this project. If you have Docker you can run:
+  $ yarn database
 
-## Running the app
-In order to run the project, open the folder, and run the `app.js` file:
-
-    $ cd spotify
-    $ node app.js
+## Run the app
+In order to run the project, run the `app.js` file:
+  $ node app.js
 
 Then, open `http://localhost:8888` in a browser.

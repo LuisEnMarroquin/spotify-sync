@@ -21,10 +21,9 @@ services:
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       DATABASE_URL: mongodb://mongo/spotify
-      # Nginx SSL Proxy
-      VIRTUAL_HOST: ${FULL_URL}
-      LETSENCRYPT_HOST: ${FULL_URL}
       LETSENCRYPT_EMAIL: ${MY_EMAIL}
+      LETSENCRYPT_HOST: ${FULL_URL}
+      VIRTUAL_HOST: ${FULL_URL}
     networks:
       - external
       - internal
@@ -44,14 +43,12 @@ services:
   express:
     depends_on:
       - mongo
-    environment: 
-      # HTTP Basic Auth # MongoDB Connection Auth Config
+    environment:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_BASICAUTH_USERNAME: ${USERNAME:-12345678}
       ME_CONFIG_BASICAUTH_PASSWORD: ${PASSWORD:-12345678}
       ME_CONFIG_SITE_SESSIONSECRET: ${SESSIONSECRET:-12345678}
       ME_CONFIG_SITE_COOKIESECRET: ${COOKIESECRET:-12345678}
-      # Nginx SSL Proxy
       LETSENCRYPT_EMAIL: ${MY_EMAIL}
       LETSENCRYPT_HOST: db.${FULL_URL}
       VIRTUAL_HOST: db.${FULL_URL}

@@ -1,9 +1,13 @@
 **/*.md
 **/*.yml
+**/LICENSE
 **/.DS_Store
+**/CHANGELOG
 **/.directory
+**/.gitignore
 **/Dockerfile
 **/desktop.ini
+**/.dockerignore
 
 # Folders
 **/.git

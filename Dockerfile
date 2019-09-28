@@ -1,5 +1,5 @@
 # NodeJS Alpine
-FROM node:alpine
+FROM node:lts-alpine
 
 # Show all node logs
 ENV NPM_CONFIG_LOGLEVEL warn

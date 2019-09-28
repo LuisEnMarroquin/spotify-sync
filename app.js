@@ -276,7 +276,7 @@ app.get('/my_history', async function (req, res) {
 })
 
 // CronJob
-new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 1 second as the finest granularity.
+function cronjob () {
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
@@ -312,9 +312,10 @@ new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 
       })
     })
     .catch(err => { console.log('Error Users', err) })
-}, null, true, 'America/Los_Angeles')
+}
 
 // Mongoose deprecations // https://mongoosejs.com/docs/deprecations.html
+mongoose.set('useUnifiedTopology', true)
 mongoose.set('useFindAndModify', false)
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useCreateIndex', true)
@@ -343,6 +344,9 @@ var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotif
 mongoose.connect(DATABASE_URL)
   .then(() => {
     console.log(`Database on ${DATABASE_URL}`)
+    new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 1 second as the finest granularity.
+      cronjob()
+    }, null, true, 'America/Los_Angeles')
   })
   .then(() => app.listen(8888, () => {
     console.log('Listening on 8888')

@@ -1,13 +1,17 @@
 {
   "editor.tabSize": 2,
+  "files.trimFinalNewlines": true,
+  "files.insertFinalNewline": true,
+  "editor.detectIndentation": false,
+  "files.trimTrailingWhitespace": true,
   "search.exclude": {
-    "**/package-lock.json": true,
-    "**/yarn.lock": true
+    "**/yarn.lock": true,
+    "**/package-lock.json": true
   },
   "files.exclude": {
-    "**/desktop.ini": true,
+    "**/.DS_Store": true,
     "**/.directory": true,
-    "**/.DS_Store": true
+    "**/desktop.ini": true
   },
   "explorer.openEditors.visible": 6
 }
