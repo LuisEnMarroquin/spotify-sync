@@ -190,7 +190,7 @@ var last50Tracks = function (options, user, res = false) { // Responding request
 app.get('/last_played', function (req, res) {
   Users.findOne({ accessToken: req.query.access_token }).lean().exec()
     .then(data => {
-      if (!data) return res.status(404).send('Please login again')
+      if (!data) return res.status(418).send('Please login again')
       last50Tracks({
         url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
         headers: { 'Authorization': 'Bearer ' + req.query.access_token },
@@ -216,7 +216,7 @@ app.get('/my_history', async function (req, res) {
   if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
   // Getting user
   var user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
-  if (!user) return res.status(404).send('Please login again') // Your access token has probably expired
+  if (!user) return res.status(418).send('Please login again') // Your access token has probably expired
   if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
   // Getting tracks && documents length
   var filter = { user: user.id }
@@ -344,7 +344,8 @@ var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotif
 mongoose.connect(DATABASE_URL)
   .then(() => {
     console.log(`Database on ${DATABASE_URL}`)
-    new CronJob('0 0 * * * *', function () { // Every hour, yes it has 6 dots, with 1 second as the finest granularity.
+    // Every hour, yes it has 6 dots, with 1 second as the finest granularity.
+    new CronJob('0 0 * * * *', function () { // eslint-disable-line no-new
       cronjob()
     }, null, true, 'America/Los_Angeles')
   })

@@ -7,18 +7,17 @@ self.addEventListener('install', function (event) {
     caches.open(CACHE_NAME).then(function (cache) {
       return cache.addAll(
         [
-          '/index.html',
-          '/index.css',
           '/index.js',
-          '/bootstrap/css/bootstrap.min.css',
+          '/logo.png',
+          '/index.css',
+          '/index.html',
+          '/favicon.png',
+          '/manifest.json',
           '/jquery/jquery.min.js',
           '/popper/popper.min.js',
           '/handlebars/handlebars.min.js',
           '/bootstrap/js/bootstrap.min.js',
-          '/bg1.jpg',
-          '/now-logo.png',
-          '/favicon-16x16.png',
-          '/favicon-32x32.png'
+          '/bootstrap/css/bootstrap.min.css'
         ]
       )
     })
@@ -36,9 +35,7 @@ self.addEventListener('fetch', function (event) {
         return fetch(event.request).then(
           function (response) {
             // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response
-            }
+            if (!response || response.status !== 200 || response.type !== 'basic') return response
 
             // IMPORTANT: Clone the response. A response is a stream
             // and because we want the browser to consume the response

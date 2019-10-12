@@ -1,8 +1,8 @@
 {
   "name": "Spotify History",
-  "short_name": "SpotyHistory",
+  "short_name": "Play History",
   "display": "standalone",
-  "theme_color": "#53bb4e",
-  "background_color": "#2196f3",
+  "theme_color": "#1DB954",
+  "background_color": "#FFF",
   "start_url": "/"
 }

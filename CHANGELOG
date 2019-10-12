@@ -1,0 +1,22 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Released]
+
+## [1.0.0] - 2019-12-10
+### Added
+- VSCode settings `.vscode/settings.json`
+- CI deploy with `.gitlab-ci.yml`, `docker-compose.yml` and `Dockerfile`
+- New `CHANGELOG`, `CONTRIBUTING.md` and `LICENSE`
+- Empty mongoose models at `models/*`
+- Static files at `public/*`
+- Api service at `app.js`
+### Changed
+- No service worker
+### Removed
+- .DS_Store
+- .directory
+- desktop.ini

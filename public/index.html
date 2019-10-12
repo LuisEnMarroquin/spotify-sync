@@ -5,11 +5,10 @@
     <title>Spotify Listening History</title>
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" async>
     <link rel="stylesheet" href="index.css"> <!-- Should never be async -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="Description" content="An app to save Spotify play history.">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="manifest" href="/manifest.json">
   </head>
 
   <body>
@@ -17,11 +16,11 @@
 
       <div id="login">
         <div class="page-header clear-filter" filter-color="orange">
-          <div class="page-header-image" data-parallax="true" style="background-image:url('./bg1.jpg');">
+          <div class="page-header-image" data-parallax="true">
           </div>
           <div class="container">
             <div class="content-center brand">
-              <img src="./now-logo.png" alt="" style='max-width: 100px; margin-bottom: 40px;'>
+              <img src="./logo.png" alt="" style='max-width: 100px; margin-bottom: 40px;'>
               <h1 style='text-transform: uppercase; margin-bottom: 30px;'>Spotify Sync</h1>
               <h3>Spotify playback history using Authorization Code Flow</h3>
               <a href="/login" class="btn btn-primary btn-lg" style='margin-top: 30px;'>Log in with Spotify</a>

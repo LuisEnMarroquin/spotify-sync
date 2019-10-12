@@ -13,10 +13,12 @@ Once you have created your app, create an `.env` file and add the `CLIENT_ID` an
 
 ## Run database
 MongoDB is needed to run this project. If you have Docker you can run:
+
   $ yarn database
 
 ## Run the app
 In order to run the project, run the `app.js` file:
+
   $ node app.js
 
 Then, open `http://localhost:8888` in a browser.

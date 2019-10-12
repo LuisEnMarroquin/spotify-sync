@@ -2,7 +2,7 @@
   "author": "Spotify",
   "name": "web-api-auth-examples",
   "description": "Basic example of the Spotify authorization flow through OAuth 2",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "nodemon app.js",

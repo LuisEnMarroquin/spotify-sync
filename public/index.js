@@ -11,7 +11,7 @@
   function getHashParams () { // Obtains parameters from the hash of the URL
     var hashParams = {}
     var e; var r = /([^&;=]+)=?([^&;]*)/g; var q = window.location.hash.substring(1)
-    while (e = r.exec(q)) { hashParams[e[1]] = decodeURIComponent(e[2]) }
+    while (e = r.exec(q)) { hashParams[e[1]] = decodeURIComponent(e[2]) } // eslint-disable-line no-cond-assign
     return hashParams // Returns object
   }
 
@@ -58,6 +58,9 @@
         })
       })
     })
+      .fail(function (e) {
+        if (e.status === 418) logout()
+      })
   }
 
   var params = getHashParams()
@@ -72,17 +75,20 @@
           userProfile2.innerHTML = userProfile1(response)
           $('#login').hide()
           $('#loggedin').show()
+        },
+        fail: function () { // If it fails it's maybe because your token is expired
+          logout()
         }
       })
-        .fail(function () { // If it fails it's maybe because your token is expired
-          logout()
-        })
     } else logout() // Show initial screen if no access_token
 
     document.getElementById('obtain-last-50').addEventListener('click', function () {
       $.ajax({ url: '/last_played', data: { access_token: params.access_token } })
         .done(function (data) {
           console.log(data)
+        })
+        .fail(function (e) {
+          if (e.status === 418) logout()
         })
     }, false)
 
