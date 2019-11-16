@@ -8,6 +8,8 @@
 **/Dockerfile
 **/desktop.ini
 **/.dockerignore
+**/.editorconfig
+**/.gitattributes
 
 # Folders
 **/.git

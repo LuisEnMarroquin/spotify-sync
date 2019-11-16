@@ -1,0 +1,15 @@
+# Ignore when download as zip with “export-ignore”.
+*.md export-ignore
+*.yml export-ignore
+.git/ export-ignore
+LICENSE export-ignore
+.vscode/ export-ignore
+CHANGELOG export-ignore
+.gitignore export-ignore
+Dockerfile export-ignore
+.editorconfig export-ignore
+node_modules/ export-ignore
+.gitattributes export-ignore
+
+# Default decision when conflicts appear: default, ours, then.
+yarn.lock merge=ours

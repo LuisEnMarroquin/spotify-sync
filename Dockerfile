@@ -11,10 +11,10 @@ RUN mkdir -p /opt/app
 WORKDIR /opt/app/
 
 # Copy only package.json and yarn.lock for cache
-COPY package.json yarn.lock /opt/app/
+COPY package.json yarn.lock ./
 
 # Install Dependncies
 RUN yarn install --production --ignore-optional --ignore-scripts --pure-lockfile --non-interactive
 
 # Copy Files
-COPY . /opt/app
+COPY . ./

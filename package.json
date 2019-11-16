@@ -3,7 +3,6 @@
   "name": "web-api-auth-examples",
   "description": "Basic example of the Spotify authorization flow through OAuth 2",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
     "dev": "nodemon app.js",
     "stop": "docker-compose --project-name spoty stop",
@@ -18,10 +17,10 @@
     "cron": "^1.7.2",
     "dotenv": "^8.1.0",
     "express": "^4.16.0",
-    "handlebars": "^4.5.1",
+    "handlebars": "^4.5.2",
     "helmet": "^3.21.1",
     "jquery": "^3.4.1",
-    "mongoose": "^5.7.10",
+    "mongoose": "^5.7.11",
     "popper.js": "^1.15.0",
     "request": "^2.83.0"
   },
@@ -37,21 +36,6 @@
     ]
   },
   "nodemonConfig": {
-    "ignore": [
-      ".git",
-      ".github",
-      ".gitlab",
-      ".vscode/",
-      ".DS_Store",
-      ".gitignore",
-      ".directory",
-      "Dockerfile",
-      "desktop.ini",
-      ".dockerignore",
-      "node_modules/",
-      ".gitlab-ci.yml",
-      "docker-compose.yml"
-    ],
-    "ext": "html,pug,css,styl,js,ts,vue,json"
+    "ext": "html,css,js"
   }
 }

@@ -25,39 +25,40 @@
     $.ajax({
       url: '/my_history',
       data: { page, access_token: params.access_token }
-    }).done(function (data) {
+    })
+      .done(function (data) {
       // Change global pagination variable
-      pagination = page
-      // Change global navigation variable
-      navigation = data.navigation
-      // Logging data
-      console.log(pagination, navigation, data)
-      // Create view
-      playedSongs2.innerHTML = playedSongs1(data)
-      // Remove 'active' class
-      $('.pagination-number').removeClass('active')
-      // Adding 'active' class to active pagination
-      $('#pg-' + pagination).addClass('active')
-      // Pagination previous
-      document.getElementById('pagination-previous').addEventListener('click', function () {
-        pagination -= 1
-        if (pagination < 1) pagination = 1
-        else getHistory(pagination)
-      }, false)
-      // Pagination next
-      document.getElementById('pagination-next').addEventListener('click', function () {
-        pagination += 1
-        if (pagination > navigation) pagination = navigation
-        else getHistory(pagination)
-      }, false)
-      // Adding event listenner to pagination content
-      data.nav.forEach(function (navNumber) {
-        document.getElementById('pg-' + navNumber).addEventListener('click', function () {
-          var pageNumber = Number($(this).children().text())
-          getHistory(pageNumber)
+        pagination = page
+        // Change global navigation variable
+        navigation = data.navigation
+        // Logging data
+        console.log(pagination, navigation, data)
+        // Create view
+        playedSongs2.innerHTML = playedSongs1(data)
+        // Remove 'active' class
+        $('.pagination-number').removeClass('active')
+        // Adding 'active' class to active pagination
+        $('#pg-' + pagination).addClass('active')
+        // Pagination previous
+        document.getElementById('pagination-previous').addEventListener('click', function () {
+          pagination -= 1
+          if (pagination < 1) pagination = 1
+          else getHistory(pagination)
+        }, false)
+        // Pagination next
+        document.getElementById('pagination-next').addEventListener('click', function () {
+          pagination += 1
+          if (pagination > navigation) pagination = navigation
+          else getHistory(pagination)
+        }, false)
+        // Adding event listenner to pagination content
+        data.nav.forEach(function (navNumber) {
+          document.getElementById('pg-' + navNumber).addEventListener('click', function () {
+            var pageNumber = Number($(this).children().text())
+            getHistory(pageNumber)
+          })
         })
       })
-    })
       .fail(function (e) {
         if (e.status === 418) logout()
       })
@@ -70,16 +71,16 @@
     if (params.access_token) {
       $.ajax({
         url: 'https://api.spotify.com/v1/me',
-        headers: { 'Authorization': 'Bearer ' + params.access_token },
-        success: function (response) {
-          userProfile2.innerHTML = userProfile1(response)
+        headers: { 'Authorization': 'Bearer ' + params.access_token }
+      })
+        .done(function (res) {
+          userProfile2.innerHTML = userProfile1(res)
           $('#login').hide()
           $('#loggedin').show()
-        },
-        fail: function () { // If it fails it's maybe because your token is expired
+        })
+        .fail(function () { // If it fails it's maybe because your token is expired
           logout()
-        }
-      })
+        })
     } else logout() // Show initial screen if no access_token
 
     document.getElementById('obtain-last-50').addEventListener('click', function () {
