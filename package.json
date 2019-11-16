@@ -1,6 +1,7 @@
 {
-  "author": "Spotify",
-  "name": "web-api-auth-examples",
+  "name": "spotify-sync",
+  "author": "LuisEnMarroquin <luis@marroquin.dev>",
+  "license": "LGPL-3.0-only",
   "description": "Basic example of the Spotify authorization flow through OAuth 2",
   "version": "1.0.0",
   "scripts": {
