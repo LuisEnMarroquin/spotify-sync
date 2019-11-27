@@ -138,8 +138,9 @@ app.get('/refresh_token', function (req, res) {
   })
 })
 
-var last50Tracks = function (options, user, res = false) { // Responding request
+var lastPlayedTracks = function (options, user, res = false) { // Responding request
   console.log(new Date(Date.now()).toLocaleString())
+  options.url = 'https://api.spotify.com/v1/me/player/recently-played?limit=25'
   request.get(options, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       // Enter new data
@@ -191,8 +192,7 @@ app.get('/last_played', function (req, res) {
   Users.findOne({ accessToken: req.query.access_token }).lean().exec()
     .then(data => {
       if (!data) return res.status(418).send('Please login again')
-      last50Tracks({
-        url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+      lastPlayedTracks({
         headers: { 'Authorization': 'Bearer ' + req.query.access_token },
         json: true
       }, data.id || 'Undefined', res)
@@ -300,8 +300,7 @@ function cronjob () {
         request.post(authOptions, function (error, response, body) {
           console.log(body)
           if (!error && body.access_token && response.statusCode === 200) {
-            last50Tracks({
-              url: 'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+            lastPlayedTracks({
               headers: { 'Authorization': 'Bearer ' + body.access_token },
               json: true
             }, elm.id || 'Undefined')

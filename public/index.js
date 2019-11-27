@@ -83,7 +83,7 @@
         })
     } else logout() // Show initial screen if no access_token
 
-    document.getElementById('obtain-last-50').addEventListener('click', function () {
+    document.getElementById('obtain-last-played').addEventListener('click', function () {
       $.ajax({ url: '/last_played', data: { access_token: params.access_token } })
         .done(function (data) {
           console.log(data)
