@@ -78,7 +78,7 @@ app.get('/callback', function (req, res) { // your application requests refresh 
         redirect_uri: redirectUri,
         grant_type: 'authorization_code'
       },
-      headers: { 'Authorization': 'Basic ' + bufferAuth },
+      headers: { Authorization: 'Basic ' + bufferAuth },
       json: true
     }
 
@@ -90,7 +90,7 @@ app.get('/callback', function (req, res) { // your application requests refresh 
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { 'Authorization': 'Bearer ' + accessToken },
+          headers: { Authorization: 'Bearer ' + accessToken },
           json: true
         }
 
@@ -124,7 +124,7 @@ app.get('/refresh_token', function (req, res) {
   // requesting access token from refresh token
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
-    headers: { 'Authorization': 'Basic ' + bufferAuth },
+    headers: { Authorization: 'Basic ' + bufferAuth },
     form: {
       grant_type: 'refresh_token',
       refresh_token: req.query.refresh_token
@@ -133,8 +133,8 @@ app.get('/refresh_token', function (req, res) {
   }
 
   request.post(authOptions, function (error, response, body) {
-    if (!error && response.statusCode === 200) res.status(200).send({ 'access_token': body.access_token })
-    else res.status(500).send({ 'message': 'Can\'t refresh your token' })
+    if (!error && response.statusCode === 200) res.status(200).send({ access_token: body.access_token })
+    else res.status(500).send({ message: 'Can\'t refresh your token' })
   })
 })
 
@@ -178,6 +178,22 @@ var lastPlayedTracks = function (options, user, res = false) { // Responding req
           .catch(err => { console.log(err) })
       })
       if (res) {
+        response.body.items.forEach(track => { // Formatting date
+          if (track.played_at) {
+            try {
+              var mm = new Date(track.played_at).getMonth() + 1 // Month
+              var dd = new Date(track.played_at).getDate() // Day
+              var newDate = [
+                (mm > 9 ? '' : '0') + mm + '/',
+                (dd > 9 ? '' : '0') + dd + '/',
+                new Date(track.played_at).getFullYear()
+              ].join('')
+              track.played_at = newDate
+            } catch (error) {
+              console.log('error parsing date', error)
+            }
+          }
+        })
         res.send(response)
       }
     } else {
@@ -193,7 +209,7 @@ app.get('/last_played', function (req, res) {
     .then(data => {
       if (!data) return res.status(418).send('Please login again')
       lastPlayedTracks({
-        headers: { 'Authorization': 'Bearer ' + req.query.access_token },
+        headers: { Authorization: 'Bearer ' + req.query.access_token },
         json: true
       }, data.id || 'Undefined', res)
     })
@@ -223,6 +239,7 @@ app.get('/my_history', async function (req, res) {
   var music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
   if (!music) return res.status(404).send('You have no music') // No music with your id
   var count = await Tracks.countDocuments(filter).lean().exec() // Counting songs number
+  if (count === 0) count = 1
   if (!count) return res.status(500).send('Error counting your music')
   // Declare empty array
   var body = []
@@ -230,8 +247,21 @@ app.get('/my_history', async function (req, res) {
   music.forEach(el => {
     // Define clean object
     var obj = {}
-    // played at
+    // played_at
     try { obj.played_at = el.played_at } catch (error) { obj.played_at = 'Undefined' }
+    // Formatting played_at
+    try {
+      var mm = new Date(obj.played_at).getMonth() + 1 // Month
+      var dd = new Date(obj.played_at).getDate() // Day
+      var newDate = [
+        (mm > 9 ? '' : '0') + mm + '/',
+        (dd > 9 ? '' : '0') + dd + '/',
+        new Date(obj.played_at).getFullYear()
+      ].join('')
+      obj.played_at = newDate
+    } catch (error) {
+      console.log('error parsing date', error)
+    }
     // track name
     try { obj.name = el.track.name } catch (error) { obj.name = 'Undefined' }
     // url
@@ -289,7 +319,7 @@ function cronjob () {
         console.log(elm.display_name, elm.id) // Showing username
         var authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
-          headers: { 'Authorization': 'Basic ' + bufferAuth },
+          headers: { Authorization: 'Basic ' + bufferAuth },
           form: {
             grant_type: 'refresh_token',
             refresh_token: elm.refreshToken
@@ -301,7 +331,7 @@ function cronjob () {
           console.log(body)
           if (!error && body.access_token && response.statusCode === 200) {
             lastPlayedTracks({
-              headers: { 'Authorization': 'Bearer ' + body.access_token },
+              headers: { Authorization: 'Bearer ' + body.access_token },
               json: true
             }, elm.id || 'Undefined')
           } else {

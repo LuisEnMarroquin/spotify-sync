@@ -78,6 +78,9 @@
           <dt>Spotify URI</dt>
           <dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
         </div>
+        <div class="col-12 my-auto pt-common text-left">
+          <p class="text-bold">* Updates every hour</p>
+        </div>
       </div>
     </script>
 
@@ -109,6 +112,10 @@
                     <a href='{{url}}'>
                       <h5 class="mt-0">{{name}}</h5>
                     </a>
+                    <div>
+                      <span class='inline-block text-bold'>Played:</span>
+                      <span class='inline-block'>{{played_at}}</span>
+                    </div>
                     <div>
                       <span class='inline-block text-bold'>Artists:</span>
                       <span class='inline-block'>{{artist}}</span>

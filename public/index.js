@@ -71,7 +71,7 @@
     if (params.access_token) {
       $.ajax({
         url: 'https://api.spotify.com/v1/me',
-        headers: { 'Authorization': 'Bearer ' + params.access_token }
+        headers: { Authorization: 'Bearer ' + params.access_token }
       })
         .done(function (res) {
           userProfile2.innerHTML = userProfile1(res)
