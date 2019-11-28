@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `CHANGELOG`, `CONTRIBUTING.md` and `LICENSE`
 - Empty mongoose models at `models/*`
 - Static files at `public/*`
-- Api service at `app.js`
+- Api service at `server.js`
 ### Changed
 - No service worker
 ### Removed

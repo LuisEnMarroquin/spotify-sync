@@ -5,7 +5,7 @@
   "description": "Basic example of the Spotify authorization flow through OAuth 2",
   "version": "1.0.0",
   "scripts": {
-    "dev": "nodemon app.js",
+    "dev": "nodemon server.js",
     "latest": "yarn upgrade --latest",
     "stop": "docker-compose --project-name spoty stop",
     "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans",

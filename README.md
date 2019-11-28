@@ -18,9 +18,9 @@ yarn database
 ```
 
 ## Run the app
-In order to run the project, run the `app.js` file:
+In order to run the project, run `server.js`:
 ```shell
-node app.js
+node server.js
 ```
 
 Then, open `http://localhost:8888` in a browser.
