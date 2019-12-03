@@ -8,7 +8,7 @@ self.addEventListener('install', function (event) {
       return cache.addAll(
         [
           '/index.js',
-          '/logo.png',
+          '/spotify-icon.png',
           '/index.css',
           '/index.html',
           '/favicon.png',

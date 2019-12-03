@@ -27,9 +27,9 @@
           </div>
           <div class="container">
             <div class="content-center brand">
-              <img src="./logo.png" alt="logo" style='max-width: 100px; margin-bottom: 40px;'>
+              <img src="./spotify-icon.png" alt="image" style='max-width: 150px; margin-bottom: 40px;'>
               <h1 style='text-transform: uppercase; margin-bottom: 30px;'>Spotify Sync</h1>
-              <h3>Spotify playback history using Authorization Code Flow</h3>
+              <h3>Save your playback history every hour</h3>
               <a href="/login" class="btn btn-primary btn-lg" style='margin-top: 30px;'>Log in with Spotify</a>
             </div>
           </div>
@@ -78,9 +78,6 @@
           <dt>Spotify URI</dt>
           <dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
         </div>
-        <div class="col-12 my-auto pt-common text-left">
-          <p class="text-bold">* Updates every hour</p>
-        </div>
       </div>
     </script>
 
@@ -110,13 +107,13 @@
                   <img class="mr-3 my-auto" width="64" src="{{img}}" alt="image">
                   <div class="media-body my-auto" style='text-overflow: ellipsis; white-space: nowrap; overflow: hidden;'>
                     <a href='{{url}}'>
-                      <h6 class="mt-0">{{name}}</h6>
+                      <h5 class="card-title">{{name}}</h5>
                     </a>
-                    <div>
+                    <div class="card-texts">
                       <span class='inline-block text-bold'>Played:</span>
                       <span class='inline-block'>{{played_at}}</span>
                     </div>
-                    <div>
+                    <div class="card-texts">
                       <span class='inline-block text-bold'>Artists:</span>
                       <span class='inline-block'>{{artist}}</span>
                     </div>
