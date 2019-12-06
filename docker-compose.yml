@@ -11,6 +11,16 @@ volumes:
   mongoc:
 
 services:
+  mongo:
+    image: mongo:4.0
+    networks:
+      - internal
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+    volumes:
+      - mongo:/data/db
+      - mongoc:/data/configdb
   app:
     build: .
     depends_on:
@@ -28,19 +38,9 @@ services:
     ports:
       - ${PORT_APP_CI:-8888:8888}
     restart: unless-stopped
-  mongo:
-    image: mongo:4.0
-    networks:
-      - internal
-    ports:
-      - 27017:27017
-    restart: unless-stopped
-    volumes:
-      - mongo:/data/db
-      - mongoc:/data/configdb
   express:
     depends_on:
-      - mongo
+      - app
     environment:
       ME_CONFIG_MONGODB_SERVER: mongo
       ME_CONFIG_BASICAUTH_USERNAME: ${USERNAME:-12345678}
