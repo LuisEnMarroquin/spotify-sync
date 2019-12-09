@@ -12,6 +12,7 @@ volumes:
 
 services:
   mongo:
+    container_name: ${NAME_MONGO:-spotify_mongo}
     image: mongo:4.0
     networks:
       - internal
@@ -23,6 +24,7 @@ services:
       - mongoc:/data/configdb
   app:
     build: .
+    container_name: ${NAME_APP:-spotify_app}
     depends_on:
       - mongo
     environment:
@@ -39,6 +41,7 @@ services:
       - ${PORT_APP_CI:-8888:8888}
     restart: unless-stopped
   express:
+    container_name: ${NAME_EXPRESS:-spotify_express}
     depends_on:
       - app
     environment:
