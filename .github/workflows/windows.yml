@@ -1,0 +1,14 @@
+name: Build Windows
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: build
+      run: yarn install --production --ignore-optional --ignore-scripts --pure-lockfile --non-interactive
