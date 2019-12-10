@@ -15,15 +15,16 @@ variables:
     - master
   tags:
     - production
-deploy_master:
+deploy:
   <<: *master_variables
   script:
     - docker-compose pull
     - docker-compose --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
   environment:
     name: master
+    on_stop: stop
     url: https://${FULL_URL}
-stop_master:
+stop:
   <<: *master_variables
   when: manual
   script:
