@@ -22,7 +22,6 @@ deploy:
     - docker-compose --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
   environment:
     name: master
-    on_stop: stop
     url: https://${FULL_URL}
 stop:
   <<: *master_variables
