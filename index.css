@@ -1,0 +1,80 @@
+#login, #loggedin { /* By default hide both */
+  display: none;
+}
+
+dt {
+  padding-top: 3px;
+}
+
+dd {
+  overflow: hidden;
+  padding-top: 2px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.text-center {
+  text-align: center;
+  align-items: center;
+}
+
+.pt-common {
+  padding-top: 10px;
+}
+
+.content-center {
+  top: 47.5%;
+  left: 50%;
+  z-index: 2;
+  width: 100%;
+  padding: 0 15px;
+  color: #FFFFFF;
+  max-width: 880px;
+  position: absolute;
+  text-align: center;
+  -ms-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.page-header-image {
+  width: 100%;
+  z-index: -1;
+  height: 100%;
+  position: absolute;
+  background-size: cover;
+  background-position: center center;
+  background: #00c9ff; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #00c9ff, #92fe9d); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #00c9ff, #92fe9d)
+}
+
+.disable-select {
+  user-select: none; /* supported by Chrome and Opera */
+ -webkit-user-select: none; /* Safari */
+ -moz-user-select: none; /* Firefox */
+ -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.card-title {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.card-texts {
+  font-size: 0.95rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
