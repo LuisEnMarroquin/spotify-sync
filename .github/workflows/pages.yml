@@ -13,7 +13,7 @@ jobs:
     - name: Install dependencies
       run: yarn install --production --ignore-optional --ignore-scripts --pure-lockfile --non-interactive
     - name: Copy dependencies
-      run: sh ./requirements.sh
+      run: sh requirements.sh
     - name: Copy CNAME
       run: cp CNAME public/CNAME
     - name: Deploy with github-pages
