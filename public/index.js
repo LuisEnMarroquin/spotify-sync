@@ -1,4 +1,6 @@
 (function () {
+  var baseURL = '' || 'https://spotify.marroquin.dev'
+
   var pagination = 1
   var navigation = 1
 
@@ -10,7 +12,9 @@
 
   function getHashParams () { // Obtains parameters from the hash of the URL
     var hashParams = {}
-    var e; var r = /([^&;=]+)=?([^&;]*)/g; var q = window.location.hash.substring(1)
+    var e
+    var r = /([^&;=]+)=?([^&;]*)/g
+    var q = window.location.hash.substring(1)
     while (e = r.exec(q)) { hashParams[e[1]] = decodeURIComponent(e[2]) } // eslint-disable-line no-cond-assign
     return hashParams // Returns object
   }
@@ -23,7 +27,7 @@
 
   function getHistory (page) {
     $.ajax({
-      url: '/my_history',
+      url: `${baseURL}/my_history`,
       data: { page, access_token: params.access_token }
     })
       .done(function (data) {
@@ -84,7 +88,7 @@
     } else logout() // Show initial screen if no access_token
 
     document.getElementById('obtain-last-played').addEventListener('click', function () {
-      $.ajax({ url: '/last_played', data: { access_token: params.access_token } })
+      $.ajax({ url: `${baseURL}/last_played`, data: { access_token: params.access_token } })
         .done(function (data) {
           console.log(data)
         })

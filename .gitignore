@@ -16,3 +16,9 @@ lerna-debug.log*
 
 # Env file
 .env
+
+# Dependencies in public folder
+public/jquery/
+public/popper/
+public/bootstrap/
+public/handlebars/

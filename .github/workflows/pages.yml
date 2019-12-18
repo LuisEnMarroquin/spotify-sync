@@ -1,0 +1,25 @@
+name: Pages
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: yarn install --production --ignore-optional --ignore-scripts --pure-lockfile --non-interactive
+    - name: Copy dependencies
+      run: sh requirements.sh
+    - name: Copy CNAME
+      run: cp CNAME public/CNAME
+    - name: Deploy with github-pages
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.PUBLIC_REPO }}
+        BASE_BRANCH: master
+        BRANCH: gh-pages
+        FOLDER: public
