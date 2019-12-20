@@ -1,5 +1,13 @@
 (function () {
-  var baseURL = '' || 'https://spotify.marroquin.dev'
+  var baseURL
+
+  $.ajax({ url: '/CNAME', type: 'HEAD' })
+    .done(function () {
+      baseURL = 'https://spotify.marroquin.dev'
+    })
+    .fail(function () {
+      baseURL = ''
+    })
 
   var pagination = 1
   var navigation = 1

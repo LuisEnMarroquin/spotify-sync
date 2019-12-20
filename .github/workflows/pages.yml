@@ -16,6 +16,8 @@ jobs:
       run: sh requirements.sh
     - name: Copy CNAME
       run: cp CNAME public/CNAME
+    - name: List files
+      run: cd public && ls -R
     - name: Deploy with github-pages
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
