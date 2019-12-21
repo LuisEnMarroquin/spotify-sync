@@ -9,6 +9,10 @@
       baseURL = ''
     })
 
+  document.getElementById('login-button').addEventListener('click', function () {
+    window.location.href = baseURL + "/login";
+  }, false)
+
   var pagination = 1
   var navigation = 1
 
