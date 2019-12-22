@@ -1,16 +1,11 @@
 (function () {
   var baseURL
 
-  $.ajax({ url: '/CNAME', type: 'HEAD' })
-    .done(function () {
-      baseURL = 'https://spotify.marroquin.dev'
-    })
-    .fail(function () {
-      baseURL = ''
-    })
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') baseURL = ''
+  else baseURL = 'https://spotify.marroquin.dev'
 
   document.getElementById('login-button').addEventListener('click', function () {
-    window.location.href = baseURL + "/login";
+    window.location.href = baseURL + '/login'
   }, false)
 
   var pagination = 1
