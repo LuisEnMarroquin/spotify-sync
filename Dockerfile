@@ -4,9 +4,6 @@ FROM node:lts-alpine
 # Show all node logs
 ENV NPM_CONFIG_LOGLEVEL warn
 
-# Create app directory
-RUN mkdir -p /opt/app
-
 # Set working directory
 WORKDIR /opt/app/
 
@@ -14,7 +11,7 @@ WORKDIR /opt/app/
 COPY package.json yarn.lock ./
 
 # Install dependncies
-RUN yarn install --production --ignore-optional --ignore-scripts --pure-lockfile --non-interactive
+RUN yarn install --production --ignore-optional --pure-lockfile --non-interactive
 
 # Copy Files
 COPY . ./

@@ -1,10 +1,10 @@
-# Sync your Spotify's playback history every hour
+# history-sync-for-spotify
 
-This is a mirror or [gitlab.com/chimenea/spotify](https://gitlab.com/chimenea/spotify)
+Sync your Spotify's playback history every hour
 
-Initially folked from [github.com/spotify/web-api-auth-examples](https://github.com/spotify/web-api-auth-examples)
-
-This project uses Authorization Code Flow to [authenticate against the Spotify Web API](https://developer.spotify.com/web-api/authorization-guide)
+* This is a mirror or [gitlab.com/chimenea/spotify](https://gitlab.com/chimenea/spotify)
+* Initially folked from [github.com/spotify/web-api-auth-examples](https://github.com/spotify/web-api-auth-examples)
+* This project uses Authorization Code Flow to [authenticate against the Spotify Web API](https://developer.spotify.com/web-api/authorization-guide)
 
 ## Installation
 

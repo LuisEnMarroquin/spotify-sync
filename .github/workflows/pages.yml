@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
-      run: yarn install --production --ignore-optional --ignore-scripts --pure-lockfile --non-interactive
+      run: yarn install --production --ignore-optional --pure-lockfile --non-interactive
     - name: Copy dependencies
       run: sh requirements.sh
     - name: Copy CNAME
