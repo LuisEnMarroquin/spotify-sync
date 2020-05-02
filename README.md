@@ -1,5 +1,9 @@
 # history-sync-for-spotify
 
+[![Standard](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![GitLab](https://gitlab.com/chimenea/spotify/badges/master/pipeline.svg)](https://gitlab.com/chimenea/spotify/pipelines)
+[![GitHub](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Pages/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
+
 Sync your Spotify's playback history every hour
 
 * This is a mirror or [gitlab.com/chimenea/spotify](https://gitlab.com/chimenea/spotify)
