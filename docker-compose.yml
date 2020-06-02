@@ -34,6 +34,7 @@ services:
       DATABASE_URL: mongodb://mongo/spotify
       LETSENCRYPT_HOST: ${FULL_URL}
       VIRTUAL_HOST: ${FULL_URL}
+    image: luisenmarroquin/spotify
     networks:
       - external
       - internal
