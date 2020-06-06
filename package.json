@@ -1,18 +1,18 @@
 {
   "name": "spotify-sync",
   "author": "LuisEnMarroquin <luis@marroquin.dev>",
-  "license": "LGPL-3.0-only",
   "description": "Basic example of the Spotify authorization flow through OAuth 2",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
-    "dev": "nodemon --watch public --watch server.js server.js",
+    "start": "nodemon --watch public --watch server.js server.js",
     "latest": "yarn upgrade --latest",
     "stop": "docker-compose --project-name spoty stop",
     "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans",
-    "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.0;"
+    "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2;"
   },
   "dependencies": {
-    "bootstrap": "^4.4.1",
+    "bootstrap": "^4.5.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.4",
@@ -21,8 +21,8 @@
     "express": "^4.16.0",
     "handlebars": "^4.7.6",
     "helmet": "^3.22.0",
-    "jquery": "^3.5.0",
-    "mongoose": "^5.9.11",
+    "jquery": "^3.5.1",
+    "mongoose": "^5.9.18",
     "popper.js": "^1.16.1",
     "request": "^2.88.2"
   },

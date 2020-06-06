@@ -1,16 +1,18 @@
 const cookieParser = require('cookie-parser')
 const querystring = require('querystring')
-const compression = require('compression') // Compress public folder
+const compression = require('compression')
 const CronJob = require('cron').CronJob
-const mongoose = require('mongoose') // MongoDB with schemas framework
-const express = require('express') // Express web server framework
-const request = require('request') // "Request" library
+const mongoose = require('mongoose')
+const express = require('express')
+const request = require('request')
 const helmet = require('helmet')
 const { join } = require('path')
 const cors = require('cors')
 require('dotenv').config()
 
-if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) console.log('Create an env file with your CLIENT_ID and CLIENT_SECRET')
+if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+  console.log('Create an env file with your CLIENT_ID and CLIENT_SECRET')
+}
 
 // Models
 var Users = require('./models/users')
@@ -21,12 +23,7 @@ var stateKey = 'spotify_auth_state' // Which type of key
 var redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
 var bufferAuth = (Buffer.from(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
 
-/**
- * Generates a random string containing numbers and letters
- * @param  {number} length The length of the string
- * @return {string} The generated string
- */
-var generateRandomString = function (length) {
+var generateRandomString = (length) => {
   var text = ''
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (var i = 0; i < length; i++) {
@@ -41,18 +38,16 @@ app.use(helmet())
 app.use(compression())
 app.use(cookieParser())
 
-// Static files
-app.use(express.static(join(__dirname, '/public')))
+app.use(express.static(join(__dirname, '/public'))) // Static files
 app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
 app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
 app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
 app.use('/popper', express.static(`${__dirname}/node_modules/popper.js/dist/umd`))
 
-app.get('/login', function (req, res) {
+app.get('/login', (req, res) => {
   var state = generateRandomString(16)
   res.cookie(stateKey, state)
-  // your application requests authorization
-  res.redirect('https://accounts.spotify.com/authorize?' +
+  res.redirect('https://accounts.spotify.com/authorize?' + // your application requests authorization
     querystring.stringify({
       response_type: 'code',
       client_id: process.env.CLIENT_ID,
@@ -62,11 +57,10 @@ app.get('/login', function (req, res) {
     }))
 })
 
-app.get('/callback', function (req, res) { // your application requests refresh and access token after checking the state parameter
+app.get('/callback', (req, res) => { // your application requests refresh and access token after checking the state parameter
   var code = req.query.code || null
   var state = req.query.state || null
   var storedState = req.cookies ? req.cookies[stateKey] : null
-
   if (state === null || state !== storedState) {
     res.redirect('/#' + querystring.stringify({ error: 'state_mismatch' }))
   } else {
@@ -81,38 +75,32 @@ app.get('/callback', function (req, res) { // your application requests refresh 
       headers: { Authorization: 'Basic ' + bufferAuth },
       json: true
     }
-
-    request.post(authOptions, function (error, response, body) {
+    request.post(authOptions, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         var accessToken = body.access_token
         var refreshToken = body.refresh_token
         var expireToken = Date.now() + body.expires_in - 300 // When token expires (-300 === expire 5 minutes before)
-
         var options = {
           url: 'https://api.spotify.com/v1/me',
           headers: { Authorization: 'Bearer ' + accessToken },
           json: true
         }
-
-        // use the access token to access the Spotify Web API
-        request.get(options, function (error, response, body) {
-          // Handling error
-          if (error) {
-            console.log(error)
-            return
+        request.get(options, (error, response, body) => { // use the access token to access the Spotify Web API
+          if (error) { // Handling error
+            return console.log(error)
           }
-          // console.log(body)
           var newDoc = { ...body, accessToken, refreshToken, expireToken }
           Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
             .then(data => {
-              if (!data) console.log('User created!', newDoc.display_name) // If is a new user
-              else console.log('User updated!', data.display_name) // If user was previously in my app
+              if (!data) { // If is a new user
+                console.log('User created!', newDoc.display_name)
+              } else { // If user was previously in my app
+                console.log('User updated!', data.display_name)
+              }
             })
             .catch(err => { console.log(err) })
         })
-
-        // we can also pass the token to the browser to make requests from there
-        res.redirect('/#' + querystring.stringify({ access_token: accessToken }))
+        res.redirect('/#' + querystring.stringify({ access_token: accessToken })) // we can also pass the token to the browser to make requests from there
       } else {
         res.redirect('/#' + querystring.stringify({ error: 'invalid_token' }))
       }
@@ -120,9 +108,8 @@ app.get('/callback', function (req, res) { // your application requests refresh 
   }
 })
 
-app.get('/refresh_token', function (req, res) {
-  // requesting access token from refresh token
-  var authOptions = {
+app.get('/refresh_token', (req, res) => {
+  var authOptions = { // requesting access token using refresh token
     url: 'https://accounts.spotify.com/api/token',
     headers: { Authorization: 'Basic ' + bufferAuth },
     form: {
@@ -131,30 +118,21 @@ app.get('/refresh_token', function (req, res) {
     },
     json: true
   }
-
-  request.post(authOptions, function (error, response, body) {
-    if (!error && response.statusCode === 200) res.status(200).send({ access_token: body.access_token })
-    else res.status(500).send({ message: 'Can\'t refresh your token' })
+  request.post(authOptions, (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      res.status(200).send({ access_token: body.access_token })
+    } else {
+      res.status(500).send({ message: 'Can\'t refresh your token' })
+    }
   })
 })
 
-var lastPlayedTracks = function (options, user, res = false) { // Responding request
+var lastPlayedTracks = (options, user, res = false) => { // Responding request
   console.log(new Date(Date.now()).toLocaleString())
   options.url = 'https://api.spotify.com/v1/me/player/recently-played?limit=25'
-  request.get(options, function (error, response, body) {
+  request.get(options, (error, response, body) => {
     if (!error && response.statusCode === 200) {
-      // Enter new data
-      // response.body.items = [
-      //   {"_id":{ "$oid": "5cd9ef044a24c1649ea570bd" },"played_at":"2019-05-13T18:42:03.843Z","context":{"uri":"spotify:playlist:37i9dQZF1DZ06evO46wsnu","external_urls":{"spotify":"https://open.spotify.com/playlist/37i9dQZF1DZ06evO46wsnu"},"href":"https://api.spotify.com/v1/playlists/37i9dQZF1DZ06evO46wsnu","type":"playlist"},"createdAt":"2019-05-13T22:26:12.580Z","track":{"album":{"album_type":"album","artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"external_urls":{"spotify":"https://open.spotify.com/album/2Gq0ERke26yxdGuRvrqFTD"},"href":"https://api.spotify.com/v1/albums/2Gq0ERke26yxdGuRvrqFTD","id":"2Gq0ERke26yxdGuRvrqFTD","images":[{"height":640,"url":"https://i.scdn.co/image/d2046d9cc60a6d13d31e352c15b34a7f828c7556","width":640},{"height":300,"url":"https://i.scdn.co/image/25426703fa7efbb6a80d752e5cfaa074c76fd3ed","width":300},{"height":64,"url":"https://i.scdn.co/image/93361c25eb95d226b5f0324b3fb4704934e05645","width":64}],"name":"Endgame","release_date":"2011-01-01","release_date_precision":"day","total_tracks":12,"type":"album","uri":"spotify:album:2Gq0ERke26yxdGuRvrqFTD"},"artists":[{"external_urls":{"spotify":"https://open.spotify.com/artist/6Wr3hh341P84m3EI8qdn9O"},"href":"https://api.spotify.com/v1/artists/6Wr3hh341P84m3EI8qdn9O","id":"6Wr3hh341P84m3EI8qdn9O","name":"Rise Against","type":"artist","uri":"spotify:artist:6Wr3hh341P84m3EI8qdn9O"}],"disc_number":1,"duration_ms":239893,"explicit":false,"external_ids":{"isrc":"USUM71111144"},"external_urls":{"spotify":"https://open.spotify.com/track/6z38xRV0gxWMyjtuz5T2Ea"},"href":"https://api.spotify.com/v1/tracks/6z38xRV0gxWMyjtuz5T2Ea","id":"6z38xRV0gxWMyjtuz5T2Ea","is_local":false,"name":"Survivor Guilt","popularity":49,"preview_url":"https://p.scdn.co/mp3-preview/36e69e5a62dab3283ab495ada420ba252147b84b?cid=88f6696309ca49ada0261312613bcac0","track_number":7,"type":"track","uri":"spotify:track:6z38xRV0gxWMyjtuz5T2Ea"},"updatedAt":"2019-05-14T03:03:43.019Z"},
-      // ]
-      // response.body.items.forEach(function (element) {
-      //   try { // Deleting trash data
-      //     if (element != null) {
-      //       if (element._id != null) delete element._id
-      //     }
-      //   } catch (err) { console.log(`Deletion error: ${err}`) }
-      // })
-      response.body.items.forEach(function (element) {
+      response.body.items.forEach(element => {
         try { // Deleting trash data
           element.user = user
           if (element != null) {
@@ -169,13 +147,20 @@ var lastPlayedTracks = function (options, user, res = false) { // Responding req
               }
             }
           }
-        } catch (err) { console.log(`Deletion error: ${err}`) }
+        } catch (err) {
+          console.log(`Deletion error: ${err}`)
+        }
         Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
           .then(data => {
-            if (!data) console.log('- New track!', element.track.name, element.played_at) // If is a new track
-            else console.log('- Existing track!', data.track.name, data.played_at) // Track was previously there
+            if (!data) { // If is a new track
+              console.log('- New track!', element.track.name, element.played_at)
+            } else { // Track was previously there
+              console.log('- Existing track!', data.track.name, data.played_at)
+            }
           })
-          .catch(err => { console.log(err) })
+          .catch(err => {
+            console.log(err)
+          })
       })
       if (res) {
         response.body.items.forEach(track => { // Formatting date
@@ -197,17 +182,20 @@ var lastPlayedTracks = function (options, user, res = false) { // Responding req
         res.send(response)
       }
     } else {
-      if (res) res.send(error)
+      if (res) {
+        res.send(error)
+      }
       console.log('Error', error)
     }
   })
 }
 
-// Getting tracks from frontend
-app.get('/last_played', function (req, res) {
+app.get('/last_played', (req, res) => { // Getting tracks from frontend
   Users.findOne({ accessToken: req.query.access_token }).lean().exec()
     .then(data => {
-      if (!data) return res.status(418).send('Please login again')
+      if (!data) {
+        return res.status(418).send('Please login again')
+      }
       lastPlayedTracks({
         headers: { Authorization: 'Bearer ' + req.query.access_token },
         json: true
@@ -218,39 +206,55 @@ app.get('/last_played', function (req, res) {
       console.log('Error getting last played', err)
     })
 })
-app.get('/my_history', async function (req, res) {
-  // Handling query.page
-  if (!req.query.page) return res.status(404).send('Send me a valid page') // Aditional param is required
+
+app.get('/my_history', async (req, res) => {
+  if (!req.query.page) { // Handling query.page // Aditional param is required
+    return res.status(404).send('Send me a valid page')
+  }
   var pagination = Number(req.query.page)
-  if (isNaN(pagination)) return res.status(404).send('Your page is not a number') // Aditional param is required
+  if (isNaN(pagination)) { // Aditional param is required
+    return res.status(404).send('Your page is not a number')
+  }
   pagination = Math.round(pagination)
-  if (pagination < 1) pagination = 1
+  if (pagination < 1) {
+    pagination = 1
+  }
   var skip = 0
   var limit = 20
-  if (pagination > 1) skip = (pagination * limit) - limit
-  // Handling query.page.access_token
-  if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Aditional param is required
-  // Getting user
+  if (pagination > 1) {
+    skip = (pagination * limit) - limit
+  }
+  if (!req.query.access_token) { // Handling query.page.access_token // Aditional param is required
+    return res.status(404).send('Send me a valid access_token')
+  }
   var user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
-  if (!user) return res.status(418).send('Please login again') // Your access token has probably expired
-  if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
-  // Getting tracks && documents length
-  var filter = { user: user.id }
+  if (!user) { // Your access token has probably expired
+    return res.status(418).send('Please login again')
+  }
+  if (!user.id) { // You have no id on DB
+    return res.status(500).send('You should contact the app admin')
+  }
+  var filter = { user: user.id } // Getting tracks && documents length
   var music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
-  if (!music) return res.status(404).send('You have no music') // No music with your id
+  if (!music) { // No music with your id
+    return res.status(404).send('You have no music')
+  }
   var count = await Tracks.countDocuments(filter).lean().exec() // Counting songs number
-  if (count === 0) count = 1
-  if (!count) return res.status(500).send('Error counting your music')
-  // Declare empty array
-  var body = []
-  // Iterate
-  music.forEach(el => {
-    // Define clean object
-    var obj = {}
-    // played_at
-    try { obj.played_at = el.played_at } catch (error) { obj.played_at = 'Undefined' }
-    // Formatting played_at
-    try {
+  if (count === 0) {
+    count = 1
+  }
+  if (!count) {
+    return res.status(500).send('Error counting your music')
+  }
+  var body = [] // Declare empty array
+  music.forEach(el => { // Iterate for each music
+    var obj = {} // Create clean object
+    try { // played_at
+      obj.played_at = el.played_at
+    } catch (error) {
+      obj.played_at = 'Undefined'
+    }
+    try { // Formatting played_at
       var mm = new Date(obj.played_at).getMonth() + 1 // Month
       var dd = new Date(obj.played_at).getDate() // Day
       var newDate = [
@@ -262,33 +266,37 @@ app.get('/my_history', async function (req, res) {
     } catch (error) {
       console.log('error parsing date', error)
     }
-    // track name
-    try { obj.name = el.track.name } catch (error) { obj.name = 'Undefined' }
-    // url
-    try {
+    try { // track name
+      obj.name = el.track.name
+    } catch (error) {
+      obj.name = 'Undefined'
+    }
+    try { // url
       var url = el.track.uri.split(':')
       obj.url = 'https://open.spotify.com/' + url[1] + '/' + url[2]
-    } catch (error) { obj.uri = 'Undefined' }
-    // artist
-    try {
+    } catch (error) {
+      obj.uri = 'Undefined'
+    }
+    try { // artist
       var str = ''
       for (let i = 0; i < el.track.artists.length; i++) {
         str += el.track.artists[i].name
         if (i + 1 !== el.track.artists.length) str += ', '
       }
       obj.artist = str
-    } catch (error) { obj.artist = 'Undefined' }
-    // image
-    try { obj.img = el.track.album.images[el.track.album.images.length - 1].url } catch (error) { obj.img = 'favicon-32x32.png' }
-    // Push to array
-    body.push(obj)
+    } catch (error) {
+      obj.artist = 'Undefined'
+    }
+    try { // image
+      obj.img = el.track.album.images[el.track.album.images.length - 1].url
+    } catch (error) {
+      obj.img = 'favicon-32x32.png'
+    }
+    body.push(obj) // Push to array
   })
-  // Create nav array
-  var nav = []
-  // Calculating navigation
-  var navigation = Math.ceil(count / limit)
-  // Creating navigation array
-  if (navigation < 6) {
+  var nav = [] // Create nav array
+  var navigation = Math.ceil(count / limit) // Calculating navigation
+  if (navigation < 6) { // Creating navigation array
     for (var i = 0; i < navigation; i++) {
       nav.push(i + 1)
     }
@@ -301,21 +309,17 @@ app.get('/my_history', async function (req, res) {
   } else { // Has the at least 2 options on both sides
     nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2]
   }
-  // Send response
-  res.status(200).send({ count, body, nav, navigation })
+  res.status(200).send({ count, body, nav, navigation }) // Send response
 })
 
-// CronJob
-function cronjob () {
+var cronjob = () => { // CronJob
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
-      // If you have no users
-      if (!data) {
-        console.log('You have no users')
-        return
+      if (!data) { // If you have no users
+        return console.log('You have no users')
       }
-      data.forEach(function (elm) {
+      data.forEach(elm => {
         console.log(elm.display_name, elm.id) // Showing username
         var authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
@@ -326,8 +330,7 @@ function cronjob () {
           },
           json: true
         }
-        // Call spotify to refresh token
-        request.post(authOptions, function (error, response, body) {
+        request.post(authOptions, (error, response, body) => { // Call spotify to refresh token
           console.log(body)
           if (!error && body.access_token && response.statusCode === 200) {
             lastPlayedTracks({
@@ -340,7 +343,9 @@ function cronjob () {
         })
       })
     })
-    .catch(err => { console.log('Error Users', err) })
+    .catch(err => {
+      console.log('Error Users', err)
+    })
 }
 
 // Mongoose deprecations // https://mongoosejs.com/docs/deprecations.html
@@ -349,33 +354,13 @@ mongoose.set('useFindAndModify', false)
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useCreateIndex', true)
 
-// // Update many
-// Tracks.updateMany({}, { user: 'v9vwcwisvvr7c811mudjsptlv' }).lean().exec()
-//   .then(tra => { console.log(tra) })
-//   .catch(err => { console.log('Error Users', err) })
-// Tracks.updateMany({}, { $unset: { explicit: "" } }, { multi: true }).lean().exec()
-//   .then(tra => { console.log(tra) })
-//   .catch(err => { console.log('Error Users', err) })
-// Tracks.updateMany({}, { $unset: { is_local: "" } }, { multi: true }).lean().exec()
-//   .then(tra => { console.log(tra) })
-//   .catch(err => { console.log('Error Users', err) })
-// Tracks.find({}).exec()
-//   .then(data => {
-//     data.forEach(i => {
-//       console.log(i.played_at)
-//     })
-//   })
-//   .catch(err => { console.log('Error Users', err) })
-
 var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
 
-// Database connection
-mongoose.connect(DATABASE_URL)
+mongoose.connect(DATABASE_URL) // Database connection
   .then(() => {
     console.log(`Database on ${DATABASE_URL}`)
-    // Every hour, yes it has 6 dots, with 1 second as the finest granularity.
-    new CronJob('0 0 * * * *', function () { // eslint-disable-line no-new
-      cronjob()
+    new CronJob('0 0 * * * *', () => { // eslint-disable-line no-new
+      cronjob() // Every hour, it has 6 dots, with 1 second as the finest granularity
     }, null, true, 'America/Los_Angeles')
   })
   .then(() => app.listen(8888, () => {

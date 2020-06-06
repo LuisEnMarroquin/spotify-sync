@@ -15,13 +15,11 @@ Sync your Spotify's playback history every hour
 These examples run on Node.js. On this [website](http://www.nodejs.org) you can find instructions on how to install it.
 
 Once installed, install yarn globally
-
 ```shell
 npm install -g yarn
 ```
 
 Then clone this repo and install it's dependencies
-
 ```shell
 yarn install --pure-lockfile
 ```
@@ -38,7 +36,6 @@ For the examples, we registered these Redirect URIs:
 * http://localhost:8888/callback
 
 Once you have created your app, create an `.env` file and add the `CLIENT_ID` and `CLIENT_SECRET` that you got from your Spotify Dashboard.
-
 ```env
 CLIENT_ID=12345678
 CLIENT_SECRET=12345678
@@ -46,10 +43,9 @@ CLIENT_SECRET=12345678
 
 ## Run database
 
-[MongoDB 4.0](https://docs.mongodb.com/v4.0/tutorial) is required to run this project.
+[MongoDB 4.2](https://docs.mongodb.com/v4.2/tutorial) is required to run this project.
 
-If you have Docker you can run:
-
+If you have Docker you can run
 ```shell
 yarn database
 ```
@@ -57,7 +53,6 @@ yarn database
 ## Run the app
 
 In order to run the project, run `server.js`
-
 ```shell
 node server.js
 ```
