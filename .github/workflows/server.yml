@@ -11,3 +11,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: sh deployment.sh
+    - uses: LuisEnMarroquin/setup-ssh-action@v1.2
+      with:
+        ORIGIN: spotify.marroquin.dev
+        SSHKEY: ${{ secrets.SSH_SERVER }}
+        HOST: production
+        USER: ${{ secrets.SSH_USER }}
+    - run: ssh production ls --help

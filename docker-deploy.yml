@@ -23,7 +23,9 @@ services:
       - mongo:/data/db
       - mongoc:/data/configdb
   node:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: ${NAME_APP:-spotify_app}
     depends_on:
       - mongo
@@ -34,7 +36,7 @@ services:
       DATABASE_URL: mongodb://mongo/spotify
       LETSENCRYPT_HOST: ${FULL_URL}
       VIRTUAL_HOST: ${FULL_URL}
-    image: luisenmarroquin/spotify
+    image: luisenmarroquin/spotify-sync
     networks:
       - external
       - internal

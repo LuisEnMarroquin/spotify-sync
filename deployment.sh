@@ -12,4 +12,4 @@ cp -R node_modules/popper.js/dist/umd/* public/popper/
 mkdir public/handlebars
 cp -R node_modules/handlebars/dist/* public/handlebars/
 
-cd public && ls -R
+cd public/ && ls -R

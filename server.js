@@ -1,6 +1,6 @@
 const cookieparser = require('cookie-parser')
-const querystring = require('querystring')
 const compression = require('compression')
+const querystring = require('querystring')
 const CronJob = require('cron').CronJob
 const mongoose = require('mongoose')
 const express = require('express')
@@ -22,7 +22,7 @@ let Tracks = mongoose.model('Tracks', new mongoose.Schema({}, { strict: false, v
 // Spotify Dashboard variables
 let stateKey = 'spotify_auth_state' // Which type of key
 let redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
-let bufferAuth = (Buffer.from(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
+let bufferAuth = (Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64'))
 
 let generateRandomString = (length) => {
   let text = ''
@@ -83,20 +83,20 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
         let expireToken = Date.now() + body.expires_in - 300 // When token expires (-300 === expire 5 minutes before)
         let options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { Authorization: 'Bearer ' + accessToken },
+          headers: { Authorization: `Bearer ${accessToken}` },
           json: true
         }
         request.get(options, (error, response, body) => { // use the access token to access the Spotify Web API
-          if (error) { // Handling error
-            return console.log(error)
-          }
+          if (error) return console.log(error) // Handling error
           let newDoc = { ...body, accessToken, refreshToken, expireToken }
           Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
             .then(data => {
               if (!data) console.log('New user created!', newDoc.display_name)
               else console.log('Existing user updated!', data.display_name)
             })
-            .catch(err => { console.log(err) })
+            .catch(err => {
+              console.log(err)
+            })
         })
         res.redirect('/#' + querystring.stringify({ access_token: accessToken })) // we can also pass the token to the browser to make requests from there
       } else {
@@ -104,25 +104,6 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
       }
     })
   }
-})
-
-app.get('/refresh_token', (req, res) => {
-  let authOptions = { // requesting access token using refresh token
-    url: 'https://accounts.spotify.com/api/token',
-    headers: { Authorization: `Basic ${bufferAuth}` },
-    form: {
-      grant_type: 'refresh_token',
-      refresh_token: req.query.refresh_token
-    },
-    json: true
-  }
-  request.post(authOptions, (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      res.status(200).send({ access_token: body.access_token })
-    } else {
-      res.status(500).send({ message: 'Can\'t refresh your token' })
-    }
-  })
 })
 
 let lastPlayedTracks = (options, user, res = false) => { // Responding request
@@ -201,40 +182,24 @@ app.get('/last_played', (req, res) => { // Getting tracks from frontend
 })
 
 app.get('/my_history', async (req, res) => {
-  if (!req.query.page) { // Handling query.page // Aditional param is required
-    return res.status(404).send('Send me a valid page')
-  }
+  if (!req.query.page) return res.status(404).send('Send me a valid page') // Handling query.page // Aditional param is required
   let pagination = Number(req.query.page)
-  if (isNaN(pagination)) { // Aditional param is required
-    return res.status(404).send('Your page is not a number')
-  }
+  if (isNaN(pagination)) return res.status(404).send('Your page is not a number') // Aditional param is required
   pagination = Math.round(pagination)
   if (pagination < 1) pagination = 1
   let skip = 0
   let limit = 20
   if (pagination > 1) skip = ((pagination * limit) - limit)
-  if (!req.query.access_token) { // Handling query.page.access_token // Aditional param is required
-    return res.status(404).send('Send me a valid access_token')
-  }
+  if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Handling query.page.access_token // Aditional param is required
   let user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
-  if (!user) { // Your access token has probably expired
-    return res.status(418).send('Please login again')
-  }
-  if (!user.id) { // You have no id on DB
-    return res.status(500).send('You should contact the app admin')
-  }
+  if (!user) return res.status(418).send('Please login again') // Your access token has probably expired
+  if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
   let filter = { user: user.id } // Getting tracks && documents length
   let music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
-  if (!music) { // No music with your id
-    return res.status(404).send('You have no music')
-  }
+  if (!music) return res.status(404).send('You have no music') // No music with your id
   let count = await Tracks.countDocuments(filter).lean().exec() // Counting songs number
-  if (count === 0) {
-    count = 1
-  }
-  if (!count) {
-    return res.status(500).send('Error counting your music')
-  }
+  if (count === 0) count = 1
+  if (!count) return res.status(500).send('Error counting your music')
   let body = [] // Declare empty array
   music.forEach(el => { // Iterate for each music
     let obj = {} // Create clean object
@@ -279,7 +244,7 @@ app.get('/my_history', async (req, res) => {
     try { // image
       obj.img = el.track.album.images[el.track.album.images.length - 1].url
     } catch (error) {
-      obj.img = 'favicon-32x32.png'
+      obj.img = 'favicon.png'
     }
     body.push(obj) // Push to array
   })
@@ -289,15 +254,11 @@ app.get('/my_history', async (req, res) => {
     for (let i = 0; i < navigation; i++) {
       nav.push(i + 1)
     }
-  } else if (pagination === 1 || pagination === 2) {
-    nav = [1, 2, 3, 4, 5]
-  } else if (pagination === navigation - 1) {
-    nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
-  } else if (pagination === navigation) {
-    nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
-  } else { // Has the at least 2 options on both sides
-    nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2]
   }
+  else if (pagination === 1 || pagination === 2) nav = [1, 2, 3, 4, 5]
+  else if (pagination === navigation - 1) nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
+  else if (pagination === navigation) nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
+  else nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2] // Has at least 2 options on both sides
   res.status(200).send({ count, body, nav, navigation }) // Send response
 })
 
@@ -305,14 +266,12 @@ let cronjob = () => { // CronJob
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
-      if (!data) { // If you have no users
-        return console.log('You have no users')
-      }
+      if (!data) return console.log('You have no users') // If you have no users
       data.forEach(elm => {
         console.log(elm.display_name, elm.id) // Showing username
         let authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
-          headers: { Authorization: 'Basic ' + bufferAuth },
+          headers: { Authorization: `Basic ${bufferAuth}` },
           form: {
             grant_type: 'refresh_token',
             refresh_token: elm.refreshToken
@@ -323,11 +282,11 @@ let cronjob = () => { // CronJob
           console.log(body)
           if (!error && body.access_token && response.statusCode === 200) {
             lastPlayedTracks({
-              headers: { Authorization: 'Bearer ' + body.access_token },
+              headers: { Authorization: `Bearer ${body.access_token}` },
               json: true
             }, elm.id || 'Undefined')
           } else {
-            console.log('Can not refresh token', error)
+            console.log(`Can't refresh token`, error)
           }
         })
       })
