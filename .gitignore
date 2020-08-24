@@ -23,3 +23,9 @@ public/jquery/
 public/popper/
 public/bootstrap/
 public/handlebars/
+
+# NodeJS is creating this directory for no reason
+dist/
+
+# Test files
+nothing.*

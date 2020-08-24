@@ -5,14 +5,14 @@
   "editor.detectIndentation": false,
   "files.trimTrailingWhitespace": true,
   "search.exclude": {
-    "**/yarn.lock": true,
-    "**/package-lock.json": true,
-    "**/npm-shrinkwrap.json": true
+    "**/LICENSE": true,
+    "**/yarn.lock": true
   },
   "files.exclude": {
+    "**/dist/": true,
     "**/.DS_Store": true,
     "**/.directory": true,
-    "**/desktop.ini": true
-  },
-  "explorer.openEditors.visible": 6
+    "**/desktop.ini": true,
+    "**/node_modules/": true
+  }
 }

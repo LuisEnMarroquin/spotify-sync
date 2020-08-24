@@ -6,9 +6,6 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon --watch public --watch server.js server.js",
-    "latest": "yarn upgrade --latest",
-    "stop": "docker-compose --project-name spoty stop",
-    "docker": "docker-compose --project-name spoty up -d --build --force-recreate --remove-orphans",
     "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2;"
   },
   "dependencies": {

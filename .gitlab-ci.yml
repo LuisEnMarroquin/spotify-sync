@@ -18,8 +18,8 @@ variables:
 deploy:
   <<: *master_variables
   script:
-    - docker-compose pull
-    - docker-compose --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
+    - docker-compose -f docker-deploy.yml pull
+    - docker-compose -f docker-deploy.yml --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
   environment:
     name: master
     url: https://${FULL_URL}
@@ -47,8 +47,8 @@ stop:
 deploy_dynamic:
   <<: *dynamic_variables
   script:
-    - docker-compose pull
-    - docker-compose --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} up -d --build --force-recreate --remove-orphans
+    - docker-compose -f docker-deploy.yml pull
+    - docker-compose -f docker-deploy.yml --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} up -d --build --force-recreate --remove-orphans
   environment:
     name: dynamic
     url: https://${FULL_URL}

@@ -1,4 +1,4 @@
-version: "3.7"
+version: 3.8
 
 networks:
   external:
@@ -22,7 +22,7 @@ services:
     volumes:
       - mongo:/data/db
       - mongoc:/data/configdb
-  app:
+  node:
     build: .
     container_name: ${NAME_APP:-spotify_app}
     depends_on:
@@ -39,18 +39,18 @@ services:
       - external
       - internal
     ports:
-      - ${PORT_APP_CI:-8888:8888}
+      - 8888
     restart: unless-stopped
   express:
     container_name: ${NAME_EXPRESS:-spotify_express}
     depends_on:
-      - app
+      - node
     environment:
       ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_BASICAUTH_USERNAME: ${USERNAME:-12345678}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${PASSWORD:-12345678}
-      ME_CONFIG_SITE_SESSIONSECRET: ${SESSIONSECRET:-12345678}
-      ME_CONFIG_SITE_COOKIESECRET: ${COOKIESECRET:-12345678}
+      ME_CONFIG_SITE_COOKIESECRET: ${ME_COOKIE:-12345678}
+      ME_CONFIG_SITE_SESSIONSECRET: ${ME_SESSION:-12345678}
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_USERNAME:-12345678}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_PASSWORD:-12345678}
       LETSENCRYPT_HOST: db.${FULL_URL}
       VIRTUAL_HOST: db.${FULL_URL}
     image: mongo-express:latest
@@ -58,5 +58,5 @@ services:
       - external
       - internal
     ports:
-      - ${PORT_EXP_CI:-8690:8081}
+      - 8081
     restart: unless-stopped

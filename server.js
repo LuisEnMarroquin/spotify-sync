@@ -1,4 +1,4 @@
-const cookieParser = require('cookie-parser')
+const cookieparser = require('cookie-parser')
 const querystring = require('querystring')
 const compression = require('compression')
 const CronJob = require('cron').CronJob
@@ -11,32 +11,33 @@ const cors = require('cors')
 require('dotenv').config()
 
 if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
-  console.log('Create an env file with your CLIENT_ID and CLIENT_SECRET')
+  console.log(`Create the '.env' file with your CLIENT_ID and CLIENT_SECRET`)
+  process.exit(1)
 }
 
 // Models
-var Users = require('./models/users')
-var Tracks = require('./models/tracks')
+let Users = mongoose.model('Users', new mongoose.Schema({}, { strict: false, versionKey: false, timestamps: true }))
+let Tracks = mongoose.model('Tracks', new mongoose.Schema({}, { strict: false, versionKey: false, timestamps: true }))
 
 // Spotify Dashboard variables
-var stateKey = 'spotify_auth_state' // Which type of key
-var redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
-var bufferAuth = (Buffer.from(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
+let stateKey = 'spotify_auth_state' // Which type of key
+let redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
+let bufferAuth = (Buffer.from(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
 
-var generateRandomString = (length) => {
-  var text = ''
-  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  for (var i = 0; i < length; i++) {
+let generateRandomString = (length) => {
+  let text = ''
+  let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  for (let i = 0; i < length; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
   return text
 }
 
-var app = express()
+let app = express()
 app.use(cors())
 app.use(helmet())
 app.use(compression())
-app.use(cookieParser())
+app.use(cookieparser())
 
 app.use(express.static(join(__dirname, '/public'))) // Static files
 app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
@@ -45,7 +46,7 @@ app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
 app.use('/popper', express.static(`${__dirname}/node_modules/popper.js/dist/umd`))
 
 app.get('/login', (req, res) => {
-  var state = generateRandomString(16)
+  let state = generateRandomString(16)
   res.cookie(stateKey, state)
   res.redirect('https://accounts.spotify.com/authorize?' + // your application requests authorization
     querystring.stringify({
@@ -58,14 +59,14 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/callback', (req, res) => { // your application requests refresh and access token after checking the state parameter
-  var code = req.query.code || null
-  var state = req.query.state || null
-  var storedState = req.cookies ? req.cookies[stateKey] : null
+  let code = req.query.code || null
+  let state = req.query.state || null
+  let storedState = req.cookies ? req.cookies[stateKey] : null
   if (state === null || state !== storedState) {
     res.redirect('/#' + querystring.stringify({ error: 'state_mismatch' }))
   } else {
     res.clearCookie(stateKey)
-    var authOptions = {
+    let authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       form: {
         code: code,
@@ -77,10 +78,10 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
     }
     request.post(authOptions, (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        var accessToken = body.access_token
-        var refreshToken = body.refresh_token
-        var expireToken = Date.now() + body.expires_in - 300 // When token expires (-300 === expire 5 minutes before)
-        var options = {
+        let accessToken = body.access_token
+        let refreshToken = body.refresh_token
+        let expireToken = Date.now() + body.expires_in - 300 // When token expires (-300 === expire 5 minutes before)
+        let options = {
           url: 'https://api.spotify.com/v1/me',
           headers: { Authorization: 'Bearer ' + accessToken },
           json: true
@@ -89,14 +90,11 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
           if (error) { // Handling error
             return console.log(error)
           }
-          var newDoc = { ...body, accessToken, refreshToken, expireToken }
+          let newDoc = { ...body, accessToken, refreshToken, expireToken }
           Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
             .then(data => {
-              if (!data) { // If is a new user
-                console.log('User created!', newDoc.display_name)
-              } else { // If user was previously in my app
-                console.log('User updated!', data.display_name)
-              }
+              if (!data) console.log('New user created!', newDoc.display_name)
+              else console.log('Existing user updated!', data.display_name)
             })
             .catch(err => { console.log(err) })
         })
@@ -109,9 +107,9 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
 })
 
 app.get('/refresh_token', (req, res) => {
-  var authOptions = { // requesting access token using refresh token
+  let authOptions = { // requesting access token using refresh token
     url: 'https://accounts.spotify.com/api/token',
-    headers: { Authorization: 'Basic ' + bufferAuth },
+    headers: { Authorization: `Basic ${bufferAuth}` },
     form: {
       grant_type: 'refresh_token',
       refresh_token: req.query.refresh_token
@@ -127,7 +125,7 @@ app.get('/refresh_token', (req, res) => {
   })
 })
 
-var lastPlayedTracks = (options, user, res = false) => { // Responding request
+let lastPlayedTracks = (options, user, res = false) => { // Responding request
   console.log(new Date(Date.now()).toLocaleString())
   options.url = 'https://api.spotify.com/v1/me/player/recently-played?limit=25'
   request.get(options, (error, response, body) => {
@@ -152,11 +150,8 @@ var lastPlayedTracks = (options, user, res = false) => { // Responding request
         }
         Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
           .then(data => {
-            if (!data) { // If is a new track
-              console.log('- New track!', element.track.name, element.played_at)
-            } else { // Track was previously there
-              console.log('- Existing track!', data.track.name, data.played_at)
-            }
+            if (!data) console.log('- New track, added to DB!', element.track.name, element.played_at)
+            else console.log('- Track was already on DB!', data.track.name, data.played_at)
           })
           .catch(err => {
             console.log(err)
@@ -166,9 +161,9 @@ var lastPlayedTracks = (options, user, res = false) => { // Responding request
         response.body.items.forEach(track => { // Formatting date
           if (track.played_at) {
             try {
-              var mm = new Date(track.played_at).getMonth() + 1 // Month
-              var dd = new Date(track.played_at).getDate() // Day
-              var newDate = [
+              let mm = new Date(track.played_at).getMonth() + 1 // Month
+              let dd = new Date(track.played_at).getDate() // Day
+              let newDate = [
                 (mm > 9 ? '' : '0') + mm + '/',
                 (dd > 9 ? '' : '0') + dd + '/',
                 new Date(track.played_at).getFullYear()
@@ -182,9 +177,7 @@ var lastPlayedTracks = (options, user, res = false) => { // Responding request
         res.send(response)
       }
     } else {
-      if (res) {
-        res.send(error)
-      }
+      if (res) res.send(error)
       console.log('Error', error)
     }
   })
@@ -211,53 +204,49 @@ app.get('/my_history', async (req, res) => {
   if (!req.query.page) { // Handling query.page // Aditional param is required
     return res.status(404).send('Send me a valid page')
   }
-  var pagination = Number(req.query.page)
+  let pagination = Number(req.query.page)
   if (isNaN(pagination)) { // Aditional param is required
     return res.status(404).send('Your page is not a number')
   }
   pagination = Math.round(pagination)
-  if (pagination < 1) {
-    pagination = 1
-  }
-  var skip = 0
-  var limit = 20
-  if (pagination > 1) {
-    skip = (pagination * limit) - limit
-  }
+  if (pagination < 1) pagination = 1
+  let skip = 0
+  let limit = 20
+  if (pagination > 1) skip = ((pagination * limit) - limit)
   if (!req.query.access_token) { // Handling query.page.access_token // Aditional param is required
     return res.status(404).send('Send me a valid access_token')
   }
-  var user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
+  let user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
   if (!user) { // Your access token has probably expired
     return res.status(418).send('Please login again')
   }
   if (!user.id) { // You have no id on DB
     return res.status(500).send('You should contact the app admin')
   }
-  var filter = { user: user.id } // Getting tracks && documents length
-  var music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
+  let filter = { user: user.id } // Getting tracks && documents length
+  let music = await Tracks.find(filter, '-_id -createdAt -updatedAt -context', { skip, limit, sort: { played_at: -1 } }).lean().exec()
   if (!music) { // No music with your id
     return res.status(404).send('You have no music')
   }
-  var count = await Tracks.countDocuments(filter).lean().exec() // Counting songs number
+  let count = await Tracks.countDocuments(filter).lean().exec() // Counting songs number
   if (count === 0) {
     count = 1
   }
   if (!count) {
     return res.status(500).send('Error counting your music')
   }
-  var body = [] // Declare empty array
+  let body = [] // Declare empty array
   music.forEach(el => { // Iterate for each music
-    var obj = {} // Create clean object
+    let obj = {} // Create clean object
     try { // played_at
       obj.played_at = el.played_at
     } catch (error) {
       obj.played_at = 'Undefined'
     }
     try { // Formatting played_at
-      var mm = new Date(obj.played_at).getMonth() + 1 // Month
-      var dd = new Date(obj.played_at).getDate() // Day
-      var newDate = [
+      let mm = new Date(obj.played_at).getMonth() + 1 // Month
+      let dd = new Date(obj.played_at).getDate() // Day
+      let newDate = [
         (mm > 9 ? '' : '0') + mm + '/',
         (dd > 9 ? '' : '0') + dd + '/',
         new Date(obj.played_at).getFullYear()
@@ -272,13 +261,13 @@ app.get('/my_history', async (req, res) => {
       obj.name = 'Undefined'
     }
     try { // url
-      var url = el.track.uri.split(':')
+      let url = el.track.uri.split(':')
       obj.url = 'https://open.spotify.com/' + url[1] + '/' + url[2]
     } catch (error) {
       obj.uri = 'Undefined'
     }
     try { // artist
-      var str = ''
+      let str = ''
       for (let i = 0; i < el.track.artists.length; i++) {
         str += el.track.artists[i].name
         if (i + 1 !== el.track.artists.length) str += ', '
@@ -294,10 +283,10 @@ app.get('/my_history', async (req, res) => {
     }
     body.push(obj) // Push to array
   })
-  var nav = [] // Create nav array
-  var navigation = Math.ceil(count / limit) // Calculating navigation
+  let nav = [] // Create nav array
+  let navigation = Math.ceil(count / limit) // Calculating navigation
   if (navigation < 6) { // Creating navigation array
-    for (var i = 0; i < navigation; i++) {
+    for (let i = 0; i < navigation; i++) {
       nav.push(i + 1)
     }
   } else if (pagination === 1 || pagination === 2) {
@@ -312,7 +301,7 @@ app.get('/my_history', async (req, res) => {
   res.status(200).send({ count, body, nav, navigation }) // Send response
 })
 
-var cronjob = () => { // CronJob
+let cronjob = () => { // CronJob
   console.log('You will see this message every hour')
   Users.find({}).lean().exec()
     .then(data => {
@@ -321,7 +310,7 @@ var cronjob = () => { // CronJob
       }
       data.forEach(elm => {
         console.log(elm.display_name, elm.id) // Showing username
-        var authOptions = { // Refreshing token
+        let authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
           headers: { Authorization: 'Basic ' + bufferAuth },
           form: {
@@ -354,7 +343,7 @@ mongoose.set('useFindAndModify', false)
 mongoose.set('useNewUrlParser', true)
 mongoose.set('useCreateIndex', true)
 
-var DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
+let DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
 
 mongoose.connect(DATABASE_URL) // Database connection
   .then(() => {

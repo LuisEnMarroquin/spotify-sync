@@ -2,7 +2,6 @@
 **/*.yml
 **/LICENSE
 **/.DS_Store
-**/CHANGELOG
 **/.directory
 **/.gitignore
 **/Dockerfile
@@ -15,5 +14,4 @@
 **/.git
 **/.vscode
 **/.github
-**/.gitlab
 **/node_modules

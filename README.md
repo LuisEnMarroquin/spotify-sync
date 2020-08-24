@@ -50,7 +50,7 @@ If you have Docker you can run
 yarn database
 ```
 
-## Run the app
+## Run the application
 
 In order to run the project, run `server.js`
 ```shell

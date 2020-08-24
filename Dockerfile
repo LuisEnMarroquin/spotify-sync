@@ -16,5 +16,5 @@ RUN yarn install --production --ignore-optional --pure-lockfile --non-interactiv
 # Copy Files
 COPY . ./
 
-# Run app
+# Run the application
 CMD [ "node", "server.js" ]
