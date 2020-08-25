@@ -1,5 +1,3 @@
-yarn install --production --ignore-optional --pure-lockfile --non-interactive
-
 mkdir public/jquery
 cp -R node_modules/jquery/dist/* public/jquery/
 
@@ -11,5 +9,3 @@ cp -R node_modules/popper.js/dist/umd/* public/popper/
 
 mkdir public/handlebars
 cp -R node_modules/handlebars/dist/* public/handlebars/
-
-cd public/ && ls -R

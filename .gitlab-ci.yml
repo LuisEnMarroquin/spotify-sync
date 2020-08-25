@@ -18,8 +18,8 @@ variables:
 deploy:
   <<: *master_variables
   script:
-    - docker-compose -f docker-deploy.yml pull
-    - docker-compose -f docker-deploy.yml --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
+    - docker-compose -f compose.yml pull
+    - docker-compose -f compose.yml --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
   environment:
     name: master
     url: https://${FULL_URL}
@@ -30,32 +30,3 @@ stop:
     - docker-compose --project-name ${PRO_NAME} stop
   environment:
     name: master
-
-.variables_dynamic: &dynamic_variables
-  variables:
-    FULL_URL: ${PRO_NAME}.${CI_COMMIT_REF_NAME}.${MAIN_URL}
-    NAME_APP: ${PRO_NAME}_${CI_COMMIT_REF_NAME}_app
-    NAME_MONGO: ${PRO_NAME}_${CI_COMMIT_REF_NAME}_mongo
-    NAME_EXPRESS: ${PRO_NAME}_${CI_COMMIT_REF_NAME}_express
-  stage: deploy
-  only:
-    - branches
-  except:
-    - master
-  tags:
-    - production
-deploy_dynamic:
-  <<: *dynamic_variables
-  script:
-    - docker-compose -f docker-deploy.yml pull
-    - docker-compose -f docker-deploy.yml --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} up -d --build --force-recreate --remove-orphans
-  environment:
-    name: dynamic
-    url: https://${FULL_URL}
-stop_dynamic:
-  <<: *dynamic_variables
-  when: manual
-  script:
-    - docker-compose --project-name ${PRO_NAME}_${CI_COMMIT_REF_NAME} stop
-  environment:
-    name: dynamic

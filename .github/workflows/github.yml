@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - run: sh deployment.sh
+    - run: yarn install --production --ignore-optional --pure-lockfile --non-interactive
+    - run: sh gh-pages.sh
     - run: cp CNAME public/CNAME
     - uses: LuisEnMarroquin/gh-pages-publish@v2.3.2
       with:
