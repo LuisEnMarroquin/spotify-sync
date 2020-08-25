@@ -9,7 +9,7 @@ variables:
 
 .variables_master: &master_variables
   variables:
-    FULL_URL: ${PRO_NAME}.${MAIN_URL}
+    SPOTIFY_URL: ${PRO_NAME}.${MAIN_URL}
   stage: deploy
   only:
     - master
@@ -22,7 +22,7 @@ deploy:
     - docker-compose -f compose.yml --project-name ${PRO_NAME} up -d --build --force-recreate --remove-orphans
   environment:
     name: master
-    url: https://${FULL_URL}
+    url: https://${SPOTIFY_URL}
 stop:
   <<: *master_variables
   when: manual

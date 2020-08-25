@@ -27,12 +27,12 @@ services:
     depends_on:
       - mongo
     environment:
-      API_HOST: http://${FULL_URL:-localhost:8888}/callback
+      API_HOST: http://${SPOTIFY_URL:-localhost:8888}/callback
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET: ${CLIENT_SECRET}
       DATABASE_URL: mongodb://mongo/spotify
-      LETSENCRYPT_HOST: ${FULL_URL}
-      VIRTUAL_HOST: ${FULL_URL}
+      LETSENCRYPT_HOST: ${SPOTIFY_URL}
+      VIRTUAL_HOST: ${SPOTIFY_URL}
     image: luisenmarroquin/spotify-sync
     networks:
       - external
@@ -50,8 +50,8 @@ services:
       ME_CONFIG_SITE_SESSIONSECRET: ${ME_SESSION:-12345678}
       ME_CONFIG_BASICAUTH_USERNAME: ${ME_USERNAME:-12345678}
       ME_CONFIG_BASICAUTH_PASSWORD: ${ME_PASSWORD:-12345678}
-      LETSENCRYPT_HOST: db.${FULL_URL}
-      VIRTUAL_HOST: db.${FULL_URL}
+      LETSENCRYPT_HOST: db.${SPOTIFY_URL}
+      VIRTUAL_HOST: db.${SPOTIFY_URL}
     image: mongo-express:latest
     networks:
       - external
