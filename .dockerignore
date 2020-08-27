@@ -1,17 +1,20 @@
 **/*.md
 **/*.yml
+**/CNAME
 **/LICENSE
-**/.DS_Store
-**/.directory
 **/.gitignore
 **/Dockerfile
-**/desktop.ini
 **/.dockerignore
 **/.editorconfig
 **/.gitattributes
 
 # Folders
-**/.git
-**/.vscode
-**/.github
-**/node_modules
+**/.git/
+**/.vscode/
+**/.github/
+**/node_modules/
+
+# File managers
+**/.DS_Store
+**/.directory
+**/desktop.ini

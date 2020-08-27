@@ -24,8 +24,9 @@ public/popper/
 public/bootstrap/
 public/handlebars/
 
-# NodeJS is creating this directory for no reason
-dist/
+# No js files on those folders
+public/*.js
+scripts/*.js
 
 # Test files
 nothing.*

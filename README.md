@@ -39,7 +39,7 @@ CLIENT_ID=12345678
 CLIENT_SECRET=12345678
 ```
 
-## Run database
+## Database (important)
 
 [MongoDB 4.2](https://docs.mongodb.com/v4.2/tutorial) is required to run this project
 

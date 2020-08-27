@@ -11,6 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: yarn install --production --ignore-optional --pure-lockfile --non-interactive
+    - run: yarn compile
     - run: sh gh-pages.sh
     - run: cp CNAME public/CNAME
     - uses: LuisEnMarroquin/gh-pages-publish@v2.3.2

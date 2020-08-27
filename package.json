@@ -1,14 +1,16 @@
 {
   "name": "spotify-sync",
   "author": "LuisEnMarroquin <luis@marroquin.dev>",
-  "description": "Basic example of the Spotify authorization flow through OAuth 2",
+  "description": "Sync your Spotify's playback history every hour",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --watch public server.js",
+    "start": "nodemon --exec \"yarn compile && node server.js\"",
+    "compile": "tsc scripts/index.ts --outFile scripts/index.js --module amd --moduleResolution node && uglifyjs scripts/index.js --output public/index.js",
     "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2;"
   },
   "dependencies": {
+    "@types/bootstrap": "^4.5.0",
     "bootstrap": "^4.5.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
@@ -21,7 +23,9 @@
     "jquery": "^3.5.1",
     "mongoose": "^5.9.18",
     "popper.js": "^1.16.1",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "typescript": "^4.0.2",
+    "uglify-js": "^3.10.2"
   },
   "standard": {
     "globals": [
@@ -36,6 +40,10 @@
     ]
   },
   "nodemonConfig": {
-    "ext": "html,css,js"
+    "ext": "html,css,js,ts",
+    "ignore": [
+      "public/*.js",
+      "scripts/*.js"
+    ]
   }
 }

@@ -16,5 +16,8 @@ RUN yarn install --production --ignore-optional --pure-lockfile --non-interactiv
 # Copy Files
 COPY . ./
 
+# Compile TypeScript
+RUN yarn compile
+
 # Run the application
 CMD [ "node", "server.js" ]

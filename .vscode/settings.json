@@ -9,7 +9,6 @@
     "**/yarn.lock": true
   },
   "files.exclude": {
-    "**/dist/": true,
     "**/.DS_Store": true,
     "**/.directory": true,
     "**/desktop.ini": true,
