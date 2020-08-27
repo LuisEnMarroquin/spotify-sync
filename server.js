@@ -1,14 +1,16 @@
 const cookieparser = require('cookie-parser')
 const compression = require('compression')
 const querystring = require('querystring')
-const CronJob = require('cron').CronJob
 const mongoose = require('mongoose')
+const { CronJob } = require('cron')
 const express = require('express')
 const request = require('request')
 const helmet = require('helmet')
 const { join } = require('path')
 const cors = require('cors')
 require('dotenv').config()
+let app = express()
+let PORT = 8888
 
 if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
   console.log(`Create the '.env' file with your CLIENT_ID and CLIENT_SECRET`)
@@ -21,7 +23,7 @@ let Tracks = mongoose.model('Tracks', new mongoose.Schema({}, { strict: false, v
 
 // Spotify Dashboard variables
 let stateKey = 'spotify_auth_state' // Which type of key
-let redirectUri = process.env.API_HOST || 'http://localhost:8888/callback' // Your redirect uri (should be registered on my dashboard)
+let redirectUri = process.env.API_HOST || `http://localhost:${PORT}/callback` // Your redirect uri (should be registered on my dashboard)
 let bufferAuth = (Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64'))
 
 let generateRandomString = (length) => {
@@ -33,7 +35,6 @@ let generateRandomString = (length) => {
   return text
 }
 
-let app = express()
 app.use(cors())
 app.use(helmet())
 app.use(compression())
@@ -73,7 +74,7 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
         redirect_uri: redirectUri,
         grant_type: 'authorization_code'
       },
-      headers: { Authorization: 'Basic ' + bufferAuth },
+      headers: { Authorization: `Basic ${bufferAuth}` },
       json: true
     }
     request.post(authOptions, (error, response, body) => {
@@ -87,15 +88,15 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
           json: true
         }
         request.get(options, (error, response, body) => { // use the access token to access the Spotify Web API
-          if (error) return console.log(error) // Handling error
-          let newDoc = { ...body, accessToken, refreshToken, expireToken }
-          Users.findOneAndUpdate({ id: body.id }, newDoc, { upsert: true }).lean().exec()
+          if (error) return console.log({ error })
+          let newDocument = { ...body, accessToken, refreshToken, expireToken, activeCronjob: true }
+          Users.findOneAndUpdate({ id: body.id }, newDocument, { upsert: true }).lean().exec()
             .then(data => {
-              if (!data) console.log('New user created!', newDoc.display_name)
+              if (!data) console.log('New user created!', newDocument.display_name)
               else console.log('Existing user updated!', data.display_name)
             })
-            .catch(err => {
-              console.log(err)
+            .catch(error => {
+              console.log({ error })
             })
         })
         res.redirect('/#' + querystring.stringify({ access_token: accessToken })) // we can also pass the token to the browser to make requests from there
@@ -116,26 +117,24 @@ let lastPlayedTracks = (options, user, res = false) => { // Responding request
           element.user = user
           if (element != null) {
             if (element.track != null) {
-              if (element.track.explicit) delete element.track.explicit // If equals false won't be deleted
-              if (element.track.explicit === false) delete element.track.explicit // Delete if equals false
-              if (element.track.is_local) delete element.track.is_local // If equals false won't be deleted
-              if (element.track.is_local === false) delete element.track.is_local // Delete if equals false
+              if (element.track.explicit || element.track.explicit === false) delete element.track.explicit // Delete if exists or equals false
+              if (element.track.is_local || element.track.is_local === false) delete element.track.is_local // Delete if exists or equals false
               if (element.track.available_markets) delete element.track.available_markets
               if (element.track.album != null) {
                 if (element.track.album.available_markets) delete element.track.album.available_markets
               }
             }
           }
-        } catch (err) {
-          console.log(`Deletion error: ${err}`)
+        } catch (error) {
+          console.log('Deletion error', { error })
         }
         Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
           .then(data => {
             if (!data) console.log('- New track, added to DB!', element.track.name, element.played_at)
             else console.log('- Track was already on DB!', data.track.name, data.played_at)
           })
-          .catch(err => {
-            console.log(err)
+          .catch(error => {
+            console.log({ error })
           })
       })
       if (res) {
@@ -151,7 +150,7 @@ let lastPlayedTracks = (options, user, res = false) => { // Responding request
               ].join('')
               track.played_at = newDate
             } catch (error) {
-              console.log('error parsing date', error)
+              console.log('error parsing date', { error })
             }
           }
         })
@@ -159,7 +158,7 @@ let lastPlayedTracks = (options, user, res = false) => { // Responding request
       }
     } else {
       if (res) res.send(error)
-      console.log('Error', error)
+      console.log('Error', { error })
     }
   })
 }
@@ -175,22 +174,22 @@ app.get('/last_played', (req, res) => { // Getting tracks from frontend
         json: true
       }, data.id || 'Undefined', res)
     })
-    .catch(err => {
+    .catch(error => {
+      console.log('Error getting last played', { error })
       res.status(500).send('Error interno del servidor')
-      console.log('Error getting last played', err)
     })
 })
 
 app.get('/my_history', async (req, res) => {
-  if (!req.query.page) return res.status(404).send('Send me a valid page') // Handling query.page // Aditional param is required
+  if (!req.query.page) return res.status(404).send('Send me a valid page, additional param is required') // Handling query.page
   let pagination = Number(req.query.page)
-  if (isNaN(pagination)) return res.status(404).send('Your page is not a number') // Aditional param is required
+  if (isNaN(pagination)) return res.status(404).send('Your page is not a number, a valid param is required')
   pagination = Math.round(pagination)
   if (pagination < 1) pagination = 1
   let skip = 0
   let limit = 20
   if (pagination > 1) skip = ((pagination * limit) - limit)
-  if (!req.query.access_token) return res.status(404).send('Send me a valid access_token') // Handling query.page.access_token // Aditional param is required
+  if (!req.query.access_token) return res.status(404).send('Send me a valid access_token, a valid param is required') // Handling query.page.access_token
   let user = await Users.findOne({ accessToken: req.query.access_token }, 'id -_id').lean().exec() // Getting user id from DB
   if (!user) return res.status(418).send('Please login again') // Your access token has probably expired
   if (!user.id) return res.status(500).send('You should contact the app admin') // You have no id on DB
@@ -254,27 +253,26 @@ app.get('/my_history', async (req, res) => {
     for (let i = 0; i < navigation; i++) {
       nav.push(i + 1)
     }
-  }
-  else if (pagination === 1 || pagination === 2) nav = [1, 2, 3, 4, 5]
+  } else if (pagination === 1 || pagination === 2) nav = [1, 2, 3, 4, 5]
   else if (pagination === navigation - 1) nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
   else if (pagination === navigation) nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
   else nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2] // Has at least 2 options on both sides
   res.status(200).send({ count, body, nav, navigation }) // Send response
 })
 
-let cronjob = () => { // CronJob
+let cronjob = () => {
   console.log('You will see this message every hour')
-  Users.find({}).lean().exec()
+  Users.find({ activeCronjob: true }).lean().exec()
     .then(data => {
       if (!data) return console.log('You have no users') // If you have no users
-      data.forEach(elm => {
-        console.log(elm.display_name, elm.id) // Showing username
+      data.forEach(userFromCron => {
+        console.log(`${userFromCron.display_name} - ${userFromCron.id}`)
         let authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
           headers: { Authorization: `Basic ${bufferAuth}` },
           form: {
             grant_type: 'refresh_token',
-            refresh_token: elm.refreshToken
+            refresh_token: userFromCron.refreshToken
           },
           json: true
         }
@@ -284,15 +282,15 @@ let cronjob = () => { // CronJob
             lastPlayedTracks({
               headers: { Authorization: `Bearer ${body.access_token}` },
               json: true
-            }, elm.id || 'Undefined')
+            }, userFromCron.id || 'Undefined')
           } else {
-            console.log(`Can't refresh token`, error)
+            console.log(`Can't refresh token`, { error })
           }
         })
       })
     })
-    .catch(err => {
-      console.log('Error Users', err)
+    .catch(error => {
+      console.log('Error Users', { error })
     })
 }
 
@@ -311,9 +309,9 @@ mongoose.connect(DATABASE_URL) // Database connection
       cronjob() // Every hour, it has 6 dots, with 1 second as the finest granularity
     }, null, true, 'America/Los_Angeles')
   })
-  .then(() => app.listen(8888, () => {
-    console.log('Listening on 8888')
+  .then(() => app.listen(PORT, () => {
+    console.log(`Listening on ${PORT}`)
   }))
   .catch((error) => {
-    console.error('Error at server startup', error)
+    console.error('Error at server startup', { error })
   })

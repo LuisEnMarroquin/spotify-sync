@@ -25,6 +25,7 @@ jobs:
     - run: sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
     - run: scp .env compose.yml production:/opt/.github/spotify
     - run: ssh production docker-compose -v
-    - run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull && docker-compose -f compose.yml --project-name spotify up -d --remove-orphans'
+    - run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
+    - run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml --project-name spotify up -d --remove-orphans'
     - run: ssh production rm -rf /opt/.github/spotify
     - run: echo 'Exit code 0 is success and 1 is failure' && echo $?

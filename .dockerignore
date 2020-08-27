@@ -1,4 +1,6 @@
+**/.env
 **/*.md
+**/*.sh
 **/*.yml
 **/CNAME
 **/LICENSE

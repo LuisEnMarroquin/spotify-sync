@@ -19,5 +19,8 @@ COPY . ./
 # Compile TypeScript
 RUN yarn compile
 
+# This folder is not longed needed
+RUN rm -rf scripts/
+
 # Run the application
 CMD [ "node", "server.js" ]
