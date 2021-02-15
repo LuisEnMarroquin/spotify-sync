@@ -1,0 +1,47 @@
+name: Backup Database # Will run every day at 6 am - Mexico City
+
+on:
+  schedule: # Minute Hour DayOfMonth MonthOfYear DayOfWeek
+    - cron: '0 12 * * *' # Noon/Midday Greenwich time
+
+jobs:
+  cronjob:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Log in to remote over SSH
+      uses: LuisEnMarroquin/setup-ssh-action@v1.8
+      with:
+        ORIGIN: spotify.marroquin.dev
+        SSHKEY: ${{ secrets.SSH_SERVER }}
+        NAME: production
+        PORT: ${{ secrets.SSH_PORT }}
+        USER: ${{ secrets.SSH_USER }}
+    - name: Dumping database with mongodump gzip
+      run: ssh production docker exec -t spotify_mongo mongodump --gzip -d spotify -o backup-spotify
+    - name: Place mongodump inside tar.gz file
+      run: ssh production docker exec -t spotify_mongo tar -czvf spotify-mongo.tar.gz backup-spotify
+    - name: Moving tar.gz from container to server
+      run: ssh production docker cp spotify_mongo:/spotify-mongo.tar.gz ./
+    - name: Deleting useless files from container
+      run: ssh production docker exec -t spotify_mongo rm -rf backup-spotify spotify-mongo.tar.gz
+    - name: Moving tar.gz from server to GitHub
+      run: scp production:~/spotify-mongo.tar.gz ./
+    - name: Deleting tar.gz from server home
+      run: ssh production rm ~/spotify-mongo.tar.gz
+    - name: Extracting tar.gz in current folder
+      run: tar -xvf spotify-mongo.tar.gz
+    - name: Log in to GitLab over SSH
+      uses: LuisEnMarroquin/setup-ssh-action@v1.8
+      with:
+        ORIGIN: gitlab.com
+        SSHKEY: ${{ secrets.SSH_GITLAB }}
+    - name: Testing GitLab SSH connection
+      run: ssh -T git@gitlab.com || true
+    - name: Setting Git global user name and email
+      run: git config --global user.name "LuisEnMarroquin" && git config --global user.email "mluis651@gmail.com"
+    - name: Clone Git repo from GitLab
+      run: git clone --depth 1 git@gitlab.com:LuisEnMarroquin/spotify-sync.git spotify-repo
+    - name: Copy backup files to repo
+      run: cp -a ./backup-spotify/spotify/. ./spotify-repo
+    - name: Pushing changes to GitLab repo
+      run: cd spotify-repo && git add . && git commit --allow-empty -m "Backup at $(date)" && git push -u origin main
