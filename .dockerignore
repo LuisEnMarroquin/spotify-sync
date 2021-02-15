@@ -7,8 +7,6 @@
 **/.gitignore
 **/Dockerfile
 **/.dockerignore
-**/.editorconfig
-**/.gitattributes
 
 # Folders
 **/.git/
