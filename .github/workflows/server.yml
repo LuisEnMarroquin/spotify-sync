@@ -13,7 +13,7 @@ jobs:
     - run: docker login -u luisenmarroquin -p ${{ secrets.DOCKER_PASSWORD }}
     - run: docker build --tag luisenmarroquin/spotify-sync:latest .
     - run: docker push luisenmarroquin/spotify-sync:latest
-    - uses: LuisEnMarroquin/setup-ssh-action@v1.5
+    - uses: LuisEnMarroquin/setup-ssh-action@v1.8
       with:
         ORIGIN: spotify.marroquin.dev
         SSHKEY: ${{ secrets.SSH_SERVER }}
