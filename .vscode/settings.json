@@ -6,7 +6,7 @@
   "files.trimTrailingWhitespace": true,
   "search.exclude": {
     "**/LICENSE": true,
-    "**/yarn.lock": true
+    "**/package-lock.json": true
   },
   "files.exclude": {
     "**/.DS_Store": true,

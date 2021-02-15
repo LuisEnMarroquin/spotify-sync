@@ -7,17 +7,17 @@ ENV NPM_CONFIG_LOGLEVEL warn
 # Set working directory
 WORKDIR /opt/app/
 
-# Copy only package.json and yarn.lock for cache
-COPY package.json yarn.lock ./
+# Copy only this files for cache
+COPY package.json package-lock.json ./
 
-# Install dependncies
-RUN yarn install --production --ignore-optional --pure-lockfile --non-interactive
+# Install dependencies
+RUN npm ci
 
-# Copy Files
+# Copy all files
 COPY . ./
 
 # Compile TypeScript
-RUN yarn compile
+RUN npm run compile
 
 # This folder is not longed needed
 RUN rm -rf scripts/

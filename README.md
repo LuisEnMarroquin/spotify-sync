@@ -12,14 +12,9 @@ Sync your Spotify's playback history every hour
 
 These examples run on Node.js. On this [website](http://www.nodejs.org) you can find instructions on how to install it
 
-Once node is installed, install yarn globally
+Just clone this repo and install it's dependencies
 ```shell
-npm install -g yarn
-```
-
-Then clone this repo and install it's dependencies
-```shell
-yarn install --pure-lockfile
+npm install
 ```
 
 ## Use your credentials
@@ -45,7 +40,7 @@ CLIENT_SECRET=12345678
 
 If you have Docker you can run
 ```shell
-yarn database
+npm run database
 ```
 
 ## Run the application

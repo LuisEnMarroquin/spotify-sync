@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon --exec \"yarn compile && node server.js\"",
+    "start": "nodemon --exec \"npm run compile && node server.js\"",
     "compile": "tsc scripts/index.ts --outFile scripts/index.js --module amd --moduleResolution node && uglifyjs scripts/index.js --output public/index.js",
     "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2;"
   },
