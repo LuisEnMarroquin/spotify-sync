@@ -9,22 +9,31 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: docker login -u luisenmarroquin -p ${{ secrets.DOCKER_PASSWORD }}
-    - run: docker build --tag luisenmarroquin/spotify-sync:latest .
-    - run: docker push luisenmarroquin/spotify-sync:latest
-    - uses: LuisEnMarroquin/setup-ssh-action@v1.8
+    - name: Get code from GitHub
+      uses: actions/checkout@v2
+    - name: Login to Docker Hub
+      run: docker login -u luisenmarroquin -p ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build Docker image
+      run: docker build --tag luisenmarroquin/spotify-sync:latest .
+    - name: Push Docker image
+      run: docker push luisenmarroquin/spotify-sync:latest
+    - name: Log in to remote over SSH
+      uses: LuisEnMarroquin/setup-ssh-action@v1.8
       with:
         ORIGIN: spotify.marroquin.dev
         SSHKEY: ${{ secrets.SSH_SERVER }}
         NAME: production
         PORT: ${{ secrets.SSH_PORT }}
         USER: ${{ secrets.SSH_USER }}
-    - run: ssh production hostname
-    - run: ssh production 'rm -rf /opt/.github/spotify && mkdir -p /opt/.github/spotify'
-    - run: sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
-    - run: scp .env compose.yml production:/opt/.github/spotify
-    - run: ssh production docker-compose -v
-    - run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
-    - run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml --project-name spotify up -d --remove-orphans'
-    - run: ssh production rm -rf /opt/.github/spotify
+    - name: Delete spotify folder if exist and recreate it
+      run: ssh production 'rm -rf /opt/.github/spotify && mkdir -p /opt/.github/spotify'
+    - name: Create env file with secret variables
+      run: sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
+    - name: Send env and compose file over ssh
+      run: scp .env compose.yml production:/opt/.github/spotify
+    - name: Pull all images from Docker Hub
+      run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
+    - name: Deploy project in remove server
+      run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml --project-name spotify up -d --remove-orphans'
+    - name: Delete project files from remote server
+      run: ssh production rm -rf /opt/.github/spotify

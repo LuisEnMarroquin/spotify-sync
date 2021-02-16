@@ -1,8 +1,8 @@
-name: Backup Database # Will run every day at 6 am - Mexico City
+name: Backup Database
 
 on:
   schedule: # Minute Hour DayOfMonth MonthOfYear DayOfWeek
-    - cron: '0 12 * * *' # Noon/Midday Greenwich time
+    - cron: '0 10 * * *' # Greenwich time: Will run every day at 4 am Mexico City time
 
 jobs:
   cronjob:
@@ -27,7 +27,7 @@ jobs:
     - name: Moving tar.gz from server to GitHub
       run: scp production:~/spotify-mongo.tar.gz ./
     - name: Deleting tar.gz from server home
-      run: ssh production rm ~/spotify-mongo.tar.gz
+      run: ssh production "rm ~/spotify-mongo.tar.gz" # Keep "", otherwise will try to delete from GitHub
     - name: Extracting tar.gz in current folder
       run: tar -xvf spotify-mongo.tar.gz
     - name: Log in to GitLab over SSH
