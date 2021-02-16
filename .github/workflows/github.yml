@@ -9,12 +9,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - run: npm ci
-    - run: npm run compile
-    - run: sh gh-pages.sh
-    - run: cp CNAME public/CNAME
-    - uses: LuisEnMarroquin/gh-pages-publish@v2.3.2
+    - name: Get code from GitHub
+      uses: actions/checkout@v2
+    - name: Install NPM dependencies
+      run: npm ci
+    - name: Compile and minify TypeScript
+      run: npm run compile
+    - name: Copy required public dependencies
+      run: sh gh-pages.sh
+    - name: Copy CNAME to set custom URL
+      run: cp CNAME public/CNAME
+    - name: Publish to GitHub Pages
+      uses: LuisEnMarroquin/gh-pages-publish@v2.3.2
       with:
         FOLDER: public
         SSHKEY: ${{ secrets.SSH_GITHUB }}

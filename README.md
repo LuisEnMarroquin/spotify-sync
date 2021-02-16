@@ -2,6 +2,7 @@
 
 [![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/GitHub%20Pages/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
 [![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Self%20Hosted/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
+[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Backup%20Database/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
 
 Sync your Spotify's playback history every hour
 
@@ -13,6 +14,7 @@ Sync your Spotify's playback history every hour
 These examples run on Node.js. On this [website](http://www.nodejs.org) you can find instructions on how to install it
 
 Just clone this repo and install it's dependencies
+
 ```shell
 npm install
 ```
@@ -29,6 +31,7 @@ For the examples, we registered these Redirect URIs:
 * http://localhost:8888/callback
 
 Once you have created your app, create an `.env` file and add the `CLIENT_ID` and `CLIENT_SECRET` that you got from your Spotify Dashboard
+
 ```env
 CLIENT_ID=12345678
 CLIENT_SECRET=12345678
@@ -39,6 +42,7 @@ CLIENT_SECRET=12345678
 [MongoDB 4.2](https://docs.mongodb.com/v4.2/tutorial) is required to run this project
 
 If you have Docker you can run
+
 ```shell
 npm run database
 ```
@@ -46,6 +50,7 @@ npm run database
 ## Run the application
 
 In order to run the project, run `server.js`
+
 ```shell
 node server.js
 ```

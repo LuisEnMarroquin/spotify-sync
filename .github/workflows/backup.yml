@@ -44,4 +44,4 @@ jobs:
     - name: Copy backup files to repo
       run: cp -a ./backup-spotify/spotify/. ./spotify-repo
     - name: Pushing changes to GitLab repo
-      run: cd spotify-repo && git add . && git commit --allow-empty -m "Backup at $(date)" && git push -u origin main
+      run: cd spotify-repo && git add . && git commit --allow-empty -m "Backup at $(date)" && git push -u origin master
