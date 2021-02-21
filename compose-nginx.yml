@@ -1,0 +1,51 @@
+version: '3.8'
+
+networks:
+  default:
+    name: nginx-proxy
+
+volumes:
+  certs:
+  dhpar:
+  vhost:
+  htmls:
+
+services:
+  proxy:
+    container_name: nginx
+    environment:
+      HSTS: 'off'
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - certs:/etc/nginx/certs
+      - dhpar:/etc/nginx/dhparam
+      - vhost:/etc/nginx/vhost.d
+      - htmls:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  letsencrypt:
+    container_name: letsencrypt
+    depends_on:
+      - proxy
+    environment:
+      DEFAULT_EMAIL: nginx@marroquin.dev
+      NGINX_PROXY_CONTAINER: nginx
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - htmls:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  whoami:
+    container_name: whoami
+    depends_on:
+      - letsencrypt
+    environment:
+      VIRTUAL_HOST: whoami.marroquin.dev
+      LETSENCRYPT_HOST: whoami.marroquin.dev
+    image: jwilder/whoami
+    restart: unless-stopped

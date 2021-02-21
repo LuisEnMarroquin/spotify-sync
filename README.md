@@ -2,7 +2,8 @@
 
 [![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/GitHub%20Pages/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
 [![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Self%20Hosted/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
-[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Backup%20Database/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
+[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Nginx%20Proxy/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
+[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Backup%20Mongo/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
 
 Sync your Spotify's playback history every hour
 

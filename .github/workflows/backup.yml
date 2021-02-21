@@ -1,4 +1,4 @@
-name: Backup Database
+name: Backup Mongo
 
 on:
   schedule: # Minute Hour DayOfMonth MonthOfYear DayOfWeek
@@ -8,15 +8,14 @@ jobs:
   cronjob:
     runs-on: ubuntu-latest
     steps:
-    - name: Log in to remote over SSH
-      uses: LuisEnMarroquin/setup-ssh-action@v1.8
+    - uses: LuisEnMarroquin/setup-ssh-action@v1.8
       with:
         ORIGIN: spotify.marroquin.dev
         SSHKEY: ${{ secrets.SSH_SERVER }}
         NAME: production
         PORT: ${{ secrets.SSH_PORT }}
         USER: ${{ secrets.SSH_USER }}
-    - name: Dumping database with mongodump gzip
+    - name: Dumping DB with mongodump gzip
       run: ssh production docker exec -t spotify_mongo mongodump --gzip -d spotify -o backup-spotify
     - name: Place mongodump inside tar.gz file
       run: ssh production docker exec -t spotify_mongo tar -czvf spotify-mongo.tar.gz backup-spotify
@@ -30,8 +29,7 @@ jobs:
       run: ssh production "rm ~/spotify-mongo.tar.gz" # Keep "", otherwise will try to delete from GitHub
     - name: Extracting tar.gz in current folder
       run: tar -xvf spotify-mongo.tar.gz
-    - name: Log in to GitLab over SSH
-      uses: LuisEnMarroquin/setup-ssh-action@v1.8
+    - uses: LuisEnMarroquin/setup-ssh-action@v1.8
       with:
         ORIGIN: gitlab.com
         SSHKEY: ${{ secrets.SSH_GITLAB }}
