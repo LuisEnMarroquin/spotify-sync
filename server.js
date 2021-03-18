@@ -23,12 +23,11 @@ let Tracks = mongoose.model('Tracks', new mongoose.Schema({}, { strict: false, v
 
 // Spotify Dashboard variables
 let stateKey = 'spotify_auth_state' // Which type of key
-let redirectUri = process.env.API_HOST || `http://localhost:${PORT}/callback` // Your redirect uri (should be registered on my dashboard)
-let bufferAuth = (Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64'))
+let redirUri = process.env.API_HOST || `http://localhost:${PORT}/callback`
+let buffAuth = (Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64'))
 
 let generateRandomString = (length) => {
-  let text = ''
-  let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let text = '', possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < length; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
@@ -49,12 +48,13 @@ app.use('/popper', express.static(`${__dirname}/node_modules/popper.js/dist/umd`
 app.get('/login', (req, res) => {
   let state = generateRandomString(16)
   res.cookie(stateKey, state)
+  console.log({ redirUri })
   res.redirect('https://accounts.spotify.com/authorize?' + // your application requests authorization
     querystring.stringify({
       response_type: 'code',
       client_id: process.env.CLIENT_ID,
       scope: 'user-read-private user-read-email user-read-recently-played',
-      redirect_uri: redirectUri,
+      redirect_uri: redirUri,
       state: state
     }))
 })
@@ -71,10 +71,10 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
       url: 'https://accounts.spotify.com/api/token',
       form: {
         code: code,
-        redirect_uri: redirectUri,
+        redirect_uri: redirUri,
         grant_type: 'authorization_code'
       },
-      headers: { Authorization: `Basic ${bufferAuth}` },
+      headers: { Authorization: `Basic ${buffAuth}` },
       json: true
     }
     request.post(authOptions, (error, response, body) => {
@@ -269,7 +269,7 @@ let cronjob = () => {
         console.log(`${userFromCron.display_name} - ${userFromCron.id}`)
         let authOptions = { // Refreshing token
           url: 'https://accounts.spotify.com/api/token',
-          headers: { Authorization: `Basic ${bufferAuth}` },
+          headers: { Authorization: `Basic ${buffAuth}` },
           form: {
             grant_type: 'refresh_token',
             refresh_token: userFromCron.refreshToken
@@ -294,15 +294,9 @@ let cronjob = () => {
     })
 }
 
-// Mongoose deprecations // https://mongoosejs.com/docs/deprecations.html
-mongoose.set('useUnifiedTopology', true)
-mongoose.set('useFindAndModify', false)
-mongoose.set('useNewUrlParser', true)
-mongoose.set('useCreateIndex', true)
-
 let DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
 
-mongoose.connect(DATABASE_URL) // Database connection
+mongoose.connect(DATABASE_URL, { useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true })
   .then(() => {
     console.log(`Database on ${DATABASE_URL}`)
     new CronJob('0 0 * * * *', () => { // eslint-disable-line no-new

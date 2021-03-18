@@ -8,7 +8,7 @@ jobs:
   cronjob:
     runs-on: ubuntu-latest
     steps:
-    - uses: LuisEnMarroquin/setup-ssh-action@v1.8
+    - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
       with:
         ORIGIN: spotify.marroquin.dev
         SSHKEY: ${{ secrets.SSH_SERVER }}
@@ -29,7 +29,7 @@ jobs:
       run: ssh production "rm ~/spotify-mongo.tar.gz" # Keep "", otherwise will try to delete from GitHub
     - name: Extracting tar.gz in current folder
       run: tar -xvf spotify-mongo.tar.gz
-    - uses: LuisEnMarroquin/setup-ssh-action@v1.8
+    - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
       with:
         ORIGIN: gitlab.com
         SSHKEY: ${{ secrets.SSH_GITLAB }}

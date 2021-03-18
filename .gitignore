@@ -12,16 +12,9 @@ node_modules/
 # Env file
 .env
 
-# Dependencies in public folder
-public/CNAME
-public/jquery/
-public/popper/
-public/bootstrap/
-public/handlebars/
-
 # No js files on those folders
 public/*.js
-scripts/*.js
+public/*.js.map
 
 # Test files
 nothing.*

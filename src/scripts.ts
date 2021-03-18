@@ -1,18 +1,15 @@
+import { compile } from "handlebars"
+
 let baseURL:string = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? '' : 'https://spotify.marroquin.dev'
 
-document.getElementById('login-button').addEventListener('click', () => {
-  window.location.href = baseURL + '/login'
-}, false)
+document.getElementById('login-button').addEventListener('click', () => window.location.href = `${baseURL}/login`, false)
 
-let pagination:number = 1
-let navigation:number = 1
+let pagination:number = 1, navigation:number = 1
 
-// @ts-ignore
-let userProfile1 = Handlebars.compile(document.getElementById('perfil-template').innerHTML)
+let userProfile1 = compile(document.getElementById('perfil-template').innerHTML)
 let userProfile2 = document.getElementById('perfil')
 
-// @ts-ignore
-let playedSongs1 = Handlebars.compile(document.getElementById('played-template').innerHTML)
+let playedSongs1 = compile(document.getElementById('played-template').innerHTML)
 let playedSongs2 = document.getElementById('played')
 
 let getHashParams = () => { // Obtains parameters from the hash of the URL
@@ -21,7 +18,7 @@ let getHashParams = () => { // Obtains parameters from the hash of the URL
   let r = /([^&;=]+)=?([^&;]*)/g
   let q = window.location.hash.substring(1)
   while (e = r.exec(q)) { hashParams[e[1]] = decodeURIComponent(e[2]) } // eslint-disable-line no-cond-assign
-  // console.log({ hashParams })
+  console.log({ hashParams })
   return hashParams // Returns object
 }
 
@@ -100,7 +97,7 @@ else {
         console.log(data)
       })
       .fail(error => {
-        if (error.status === 418) logout()
+        error.status === 418 ? logout() : console.log({ error })
       })
   }, false)
 

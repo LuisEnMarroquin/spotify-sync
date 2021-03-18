@@ -7,11 +7,11 @@ ENV NPM_CONFIG_LOGLEVEL warn
 # Set working directory
 WORKDIR /opt/app/
 
-# Copy only this files for cache
+# Copy only this for cache
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --omit=dev --omit=optional
 
 # Copy all files
 COPY . ./
@@ -20,7 +20,7 @@ COPY . ./
 RUN npm run compile
 
 # This folder is not longed needed
-RUN rm -rf scripts/
+RUN rm -rf src/
 
 # Run the application
 CMD [ "node", "server.js" ]

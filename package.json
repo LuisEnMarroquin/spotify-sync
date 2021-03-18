@@ -2,11 +2,10 @@
   "name": "spotify-sync",
   "author": "LuisEnMarroquin <luis@marroquin.dev>",
   "description": "Sync your Spotify's playback history every hour",
-  "version": "1.0.0",
-  "license": "MIT",
+  "private": true,
   "scripts": {
     "start": "nodemon --exec \"npm run compile && node server.js\"",
-    "compile": "tsc scripts/index.ts --outFile scripts/index.js --module amd --moduleResolution node && uglifyjs scripts/index.js --output public/index.js",
+    "compile": "tsc && browserify public/scripts.js -o public/scripts.js && uglifyjs public/scripts.js --output public/scripts.js",
     "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2;"
   },
   "dependencies": {
@@ -24,6 +23,7 @@
     "mongoose": "^5.11.17",
     "popper.js": "^1.16.1",
     "request": "^2.88.2",
+    "ts-land": "^0.1.0",
     "typescript": "^4.0.2",
     "uglify-js": "^3.10.2"
   },
@@ -35,15 +35,13 @@
       "cache",
       "fetch",
       "caches",
-      "location",
-      "Handlebars"
+      "location"
     ]
   },
   "nodemonConfig": {
-    "ext": "html,css,js,ts",
+    "ext": "html,css,js,ts,json",
     "ignore": [
-      "public/*.js",
-      "scripts/*.js"
+      "public/*.js"
     ]
   }
 }

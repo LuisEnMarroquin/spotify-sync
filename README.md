@@ -1,9 +1,9 @@
 # History Sync for Spotify
 
-[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/GitHub%20Pages/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
-[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Self%20Hosted/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
-[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Nginx%20Proxy/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
-[![NotFound](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Backup%20Mongo/badge.svg)](https://github.com/LuisEnMarroquin/spotify-sync/actions)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/GitHub%20Pages/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Self%20Hosted/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Nginx%20Proxy/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Backup%20Mongo/badge.svg)](https://github.com/LuisEnMarroquin)
 
 Sync your Spotify's playback history every hour
 
