@@ -26,7 +26,7 @@ jobs:
     - name: Moving tar.gz from server to GitHub
       run: scp production:~/spotify-mongo.tar.gz ./
     - name: Deleting tar.gz from server home
-      run: ssh production "rm ~/spotify-mongo.tar.gz" # Keep "", otherwise will try to delete from GitHub
+      run: ssh production "rm ~/spotify-mongo.tar.gz" # Keep "", otherwise will try to delete from GitHub Runner
     - name: Extracting tar.gz in current folder
       run: tar -xvf spotify-mongo.tar.gz
     - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0

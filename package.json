@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "tsl dev src/server.ts 'npm run client'",
-    "client": "tsl client src/scripts.ts dist",
+    "client": "tsl client src/scripts.ts public",
     "server2": "tsl client src/server.ts dist",
     "server": "tsl server src/server.ts dist"
   },
@@ -32,7 +32,8 @@
   "nodemonConfig": {
     "ext": "html,css,js,ts,json",
     "ignore": [
-      "dist/"
+      "dist/",
+      "public/*.js"
     ]
   }
 }

@@ -10,12 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install NPM dependencies
-      run: npm ci --omit=dev --omit=optional
-    - name: Compile and minify TypeScript
-      run: npm run compile
-    - name: Copy CNAME to set custom URL
-      run: cp CNAME public/CNAME
+    - name: Build files for GitHub Pages
+      run: |
+        npm ci --omit=dev --omit=optional
+        npm run compile
+        cp CNAME public/CNAME
     - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
       with:
         FOLDER: public
@@ -24,12 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Login to Docker Hub
-      run: docker login -u luisenmarroquin -p ${{ secrets.DOCKER_PASSWORD }}
-    - name: Build Docker image
-      run: docker build --tag luisenmarroquin/spotify-sync:latest .
-    - name: Push Docker image
-      run: docker push luisenmarroquin/spotify-sync:latest
+    - name: Push image to Docker Hub
+      run: |
+        docker login -u luisenmarroquin -p ${{ secrets.DOCKER_PASSWORD }}
+        docker build --tag luisenmarroquin/spotify-sync:latest .
+        docker push luisenmarroquin/spotify-sync:latest
     - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
       with:
         ORIGIN: spotify.marroquin.dev

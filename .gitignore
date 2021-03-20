@@ -12,8 +12,9 @@ node_modules/
 # Env file
 .env
 
-# No js files on those folders
+# Built js
 dist/
+public/*.js
 
 # Test files
 nothing.*
