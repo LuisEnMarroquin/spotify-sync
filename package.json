@@ -4,13 +4,12 @@
   "description": "Sync your Spotify's playback history every hour",
   "private": true,
   "scripts": {
-    "start": "nodemon --exec \"npm run compile && node server.js\"",
-    "compile": "tsc && browserify public/scripts.js -o public/scripts.js && uglifyjs public/scripts.js --output public/scripts.js",
-    "database": "docker volume create mongo; docker volume create mongoc; docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2;"
+    "start": "tsl dev src/server.ts 'npm run client'",
+    "client": "tsl client src/scripts.ts dist",
+    "server2": "tsl client src/server.ts dist",
+    "server": "tsl server src/server.ts dist"
   },
   "dependencies": {
-    "@types/bootstrap": "^4.5.0",
-    "bootstrap": "^4.5.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.4",
@@ -18,30 +17,22 @@
     "dotenv": "^8.1.0",
     "express": "^4.16.0",
     "handlebars": "^4.7.7",
-    "helmet": "^3.22.0",
-    "jquery": "^3.5.1",
     "mongoose": "^5.11.17",
-    "popper.js": "^1.16.1",
-    "request": "^2.88.2",
-    "ts-land": "^0.1.0",
-    "typescript": "^4.0.2",
-    "uglify-js": "^3.10.2"
+    "request": "^2.88.2"
   },
-  "standard": {
-    "globals": [
-      "$",
-      "self",
-      "alert",
-      "cache",
-      "fetch",
-      "caches",
-      "location"
-    ]
+  "devDependencies": {
+    "@types/bootstrap": "^5.0.9",
+    "@types/compression": "^1.7.0",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.10",
+    "@types/cron": "^1.7.2",
+    "@types/jquery": "^3.5.5",
+    "@types/request": "^2.48.5"
   },
   "nodemonConfig": {
     "ext": "html,css,js,ts,json",
     "ignore": [
-      "public/*.js"
+      "dist/"
     ]
   }
 }

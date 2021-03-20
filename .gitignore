@@ -13,8 +13,7 @@ node_modules/
 .env
 
 # No js files on those folders
-public/*.js
-public/*.js.map
+dist/
 
 # Test files
 nothing.*

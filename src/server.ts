@@ -1,70 +1,50 @@
-const cookieparser = require('cookie-parser')
-const compression = require('compression')
-const querystring = require('querystring')
-const mongoose = require('mongoose')
-const { CronJob } = require('cron')
-const express = require('express')
-const request = require('request')
-const helmet = require('helmet')
-const { join } = require('path')
-const cors = require('cors')
+import cookieparser from 'cookie-parser'
+import { stringify } from 'querystring'
+import compression from 'compression'
+import { randomBytes } from 'crypto'
+import { CronJob } from 'cron'
+import express from 'express'
+import request from 'request'
+import { join } from 'path'
+import PORT from './port'
+import cors from 'cors'
+
 require('dotenv').config()
+let { connect, model, Schema } = require('mongoose')
 let app = express()
-let PORT = 8888
 
 if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
-  console.log(`Create the '.env' file with your CLIENT_ID and CLIENT_SECRET`)
+  console.log(`Create an '.env' file with your CLIENT_ID and CLIENT_SECRET`)
   process.exit(1)
 }
 
 // Models
-let Users = mongoose.model('Users', new mongoose.Schema({}, { strict: false, versionKey: false, timestamps: true }))
-let Tracks = mongoose.model('Tracks', new mongoose.Schema({}, { strict: false, versionKey: false, timestamps: true }))
+let Users = model('Users', new Schema({}, { strict: false, versionKey: false, timestamps: true }))
+let Tracks = model('Tracks', new Schema({}, { strict: false, versionKey: false, timestamps: true }))
 
 // Spotify Dashboard variables
-let stateKey = 'spotify_auth_state' // Which type of key
+let stateKey = 'spotify_auth_state'
 let redirUri = process.env.API_HOST || `http://localhost:${PORT}/callback`
 let buffAuth = (Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64'))
 
-let generateRandomString = (length) => {
-  let text = '', possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  for (let i = 0; i < length; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length))
-  }
-  return text
-}
-
 app.use(cors())
-app.use(helmet())
 app.use(compression())
 app.use(cookieparser())
+app.use(express.static(join(__dirname, '../public')))
 
-app.use(express.static(join(__dirname, '/public'))) // Static files
-app.use('/bootstrap', express.static(`${__dirname}/node_modules/bootstrap/dist`))
-app.use('/handlebars', express.static(`${__dirname}/node_modules/handlebars/dist`))
-app.use('/jquery', express.static(`${__dirname}/node_modules/jquery/dist`))
-app.use('/popper', express.static(`${__dirname}/node_modules/popper.js/dist/umd`))
-
-app.get('/login', (req, res) => {
-  let state = generateRandomString(16)
+app.get('/login', (_, res) => {
+  let state = randomBytes(8).toString('hex')
   res.cookie(stateKey, state)
-  console.log({ redirUri })
-  res.redirect('https://accounts.spotify.com/authorize?' + // your application requests authorization
-    querystring.stringify({
-      response_type: 'code',
-      client_id: process.env.CLIENT_ID,
-      scope: 'user-read-private user-read-email user-read-recently-played',
-      redirect_uri: redirUri,
-      state: state
-    }))
+  let scope = 'user-read-private user-read-email user-read-recently-played'
+  res.redirect('https://accounts.spotify.com/authorize?' + stringify({ scope, state, response_type: 'code', redirect_uri: redirUri, client_id: process.env.CLIENT_ID }))
 })
 
 app.get('/callback', (req, res) => { // your application requests refresh and access token after checking the state parameter
-  let code = req.query.code || null
-  let state = req.query.state || null
+  let code = req.query.code
+  let state = req.query.state
   let storedState = req.cookies ? req.cookies[stateKey] : null
   if (state === null || state !== storedState) {
-    res.redirect('/#' + querystring.stringify({ error: 'state_mismatch' }))
+    res.redirect('/#' + stringify({ error: 'state_mismatch' }))
   } else {
     res.clearCookie(stateKey)
     let authOptions = {
@@ -99,82 +79,77 @@ app.get('/callback', (req, res) => { // your application requests refresh and ac
               console.log({ error })
             })
         })
-        res.redirect('/#' + querystring.stringify({ access_token: accessToken })) // we can also pass the token to the browser to make requests from there
+        res.redirect('/#' + stringify({ access_token: accessToken })) // we can also pass the token to the browser to make requests from there
       } else {
-        res.redirect('/#' + querystring.stringify({ error: 'invalid_token' }))
+        res.redirect('/#' + stringify({ error: 'invalid_token' }))
       }
     })
   }
 })
 
-let lastPlayedTracks = (options, user, res = false) => { // Responding request
-  console.log(new Date(Date.now()).toLocaleString())
-  options.url = 'https://api.spotify.com/v1/me/player/recently-played?limit=25'
-  request.get(options, (error, response, body) => {
+const formatDate = (date: Date) => {
+  let mm = new Date(date).getMonth() + 1 // Month
+  let dd = new Date(date).getDate() // Day
+  let newDate = [
+    (mm > 9 ? '' : '0') + mm + '/',
+    (dd > 9 ? '' : '0') + dd + '/',
+    new Date(date).getFullYear()
+  ].join('')
+  return newDate
+}
+
+const cleanUser = (element: any) => {
+  try {
+    delete element.track.explicit
+  } catch (error) {
+    console.error({ error })
+  }
+  try {
+    delete element.track.is_local
+  } catch (error) {
+    console.error({ error })
+  }
+  try {
+    delete element.track.available_markets
+  } catch (error) {
+    console.error({ error })
+  }
+  try {
+    delete element.track.album.available_markets
+  } catch (error) {
+    console.error({ error })
+  }
+  return element
+}
+
+let lastPlayedTracks = (options, user) => { // Responding request
+  options.url = 'https://api.spotify.com/v1/me/player/recently-played?limit=20'
+  request.get(options, (error:any, response:any) => {
     if (!error && response.statusCode === 200) {
-      response.body.items.forEach(element => {
-        try { // Deleting trash data
-          element.user = user
-          if (element != null) {
-            if (element.track != null) {
-              if (element.track.explicit || element.track.explicit === false) delete element.track.explicit // Delete if exists or equals false
-              if (element.track.is_local || element.track.is_local === false) delete element.track.is_local // Delete if exists or equals false
-              if (element.track.available_markets) delete element.track.available_markets
-              if (element.track.album != null) {
-                if (element.track.album.available_markets) delete element.track.album.available_markets
-              }
-            }
-          }
-        } catch (error) {
-          console.log('Deletion error', { error })
-        }
-        Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec() // Saving to DB
-          .then(data => {
+      response.body.items.forEach((element:any) => {
+        element.user = user
+        element = cleanUser(element)
+        Tracks.findOneAndUpdate({ played_at: element.played_at }, element, { upsert: true }).lean().exec()
+          .then((data:any) => {
             if (!data) console.log('- New track, added to DB!', element.track.name, element.played_at)
             else console.log('- Track was already on DB!', data.track.name, data.played_at)
           })
-          .catch(error => {
-            console.log({ error })
-          })
+          .catch((error:any) => console.log({ error }))
       })
-      if (res) {
-        response.body.items.forEach(track => { // Formatting date
-          if (track.played_at) {
-            try {
-              let mm = new Date(track.played_at).getMonth() + 1 // Month
-              let dd = new Date(track.played_at).getDate() // Day
-              let newDate = [
-                (mm > 9 ? '' : '0') + mm + '/',
-                (dd > 9 ? '' : '0') + dd + '/',
-                new Date(track.played_at).getFullYear()
-              ].join('')
-              track.played_at = newDate
-            } catch (error) {
-              console.log('error parsing date', { error })
-            }
-          }
-        })
-        res.send(response)
-      }
     } else {
-      if (res) res.send(error)
       console.log('Error', { error })
     }
   })
 }
 
-app.get('/last_played', (req, res) => { // Getting tracks from frontend
+app.get('/last_played', (req, res) => {
   Users.findOne({ accessToken: req.query.access_token }).lean().exec()
-    .then(data => {
-      if (!data) {
-        return res.status(418).send('Please login again')
-      }
-      lastPlayedTracks({
-        headers: { Authorization: 'Bearer ' + req.query.access_token },
-        json: true
-      }, data.id || 'Undefined', res)
+    .then((data:any) => {
+      if (!data) return res.status(418).send('Please login again')
+      lastPlayedTracks({ headers: { Authorization: `Bearer ${req.query.access_token}` }, json: true }, data.id)
+      res.status(200).send('Hi')
     })
-    .catch(error => {
+    .catch((error:any) => {
       console.log('Error getting last played', { error })
       res.status(500).send('Error interno del servidor')
     })
@@ -200,37 +175,20 @@ app.get('/my_history', async (req, res) => {
   if (count === 0) count = 1
   if (!count) return res.status(500).send('Error counting your music')
   let body = [] // Declare empty array
-  music.forEach(el => { // Iterate for each music
-    let obj = {} // Create clean object
-    try { // played_at
-      obj.played_at = el.played_at
-    } catch (error) {
-      obj.played_at = 'Undefined'
+  music.forEach((el: any) => { // Iterate for each music
+    let obj = {
+      name: el.track.name,
+      played_at: el.played_at,
+      url: 'https://open.spotify.com/' + el.track.uri.split(':')[1] + '/' + el.track.uri.split(':')[2],
+      artist: '',
+      img: 'favicon.png'
     }
-    try { // Formatting played_at
-      let mm = new Date(obj.played_at).getMonth() + 1 // Month
-      let dd = new Date(obj.played_at).getDate() // Day
-      let newDate = [
-        (mm > 9 ? '' : '0') + mm + '/',
-        (dd > 9 ? '' : '0') + dd + '/',
-        new Date(obj.played_at).getFullYear()
-      ].join('')
-      obj.played_at = newDate
+    try {
+      obj.played_at = formatDate(obj.played_at)
     } catch (error) {
       console.log('error parsing date', error)
     }
-    try { // track name
-      obj.name = el.track.name
-    } catch (error) {
-      obj.name = 'Undefined'
-    }
-    try { // url
-      let url = el.track.uri.split(':')
-      obj.url = 'https://open.spotify.com/' + url[1] + '/' + url[2]
-    } catch (error) {
-      obj.uri = 'Undefined'
-    }
-    try { // artist
+    try {
       let str = ''
       for (let i = 0; i < el.track.artists.length; i++) {
         str += el.track.artists[i].name
@@ -238,22 +196,20 @@ app.get('/my_history', async (req, res) => {
       }
       obj.artist = str
     } catch (error) {
-      obj.artist = 'Undefined'
+      console.log({ error })
     }
-    try { // image
+    try {
       obj.img = el.track.album.images[el.track.album.images.length - 1].url
     } catch (error) {
-      obj.img = 'favicon.png'
+      console.log({ error })
     }
     body.push(obj) // Push to array
   })
-  let nav = [] // Create nav array
+  let nav: Array<number> = [] // Create nav array
   let navigation = Math.ceil(count / limit) // Calculating navigation
-  if (navigation < 6) { // Creating navigation array
-    for (let i = 0; i < navigation; i++) {
-      nav.push(i + 1)
-    }
-  } else if (pagination === 1 || pagination === 2) nav = [1, 2, 3, 4, 5]
+  // Creating navigation array
+  if (navigation < 6) for (let i = 0; i < navigation; i++) { nav.push(i + 1); }
+  else if (pagination === 1 || pagination === 2) nav = [1, 2, 3, 4, 5]
   else if (pagination === navigation - 1) nav = [pagination - 3, pagination - 2, pagination - 1, pagination, pagination + 1]
   else if (pagination === navigation) nav = [pagination - 4, pagination - 3, pagination - 2, pagination - 1, pagination]
   else nav = [pagination - 2, pagination - 1, pagination, pagination + 1, pagination + 2] // Has at least 2 options on both sides
@@ -279,10 +235,7 @@ let cronjob = () => {
         request.post(authOptions, (error, response, body) => { // Call spotify to refresh token
           console.log(body)
           if (!error && body.access_token && response.statusCode === 200) {
-            lastPlayedTracks({
-              headers: { Authorization: `Bearer ${body.access_token}` },
-              json: true
-            }, userFromCron.id || 'Undefined')
+            lastPlayedTracks({ headers: { Authorization: `Bearer ${body.access_token}` }, json: true }, userFromCron.id)
           } else {
             console.log(`Can't refresh token`, { error })
           }
@@ -296,12 +249,10 @@ let cronjob = () => {
 
 let DATABASE_URL = process.env.DATABASE_URL || 'mongodb://localhost:27017/spotify'
 
-mongoose.connect(DATABASE_URL, { useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true })
+connect(DATABASE_URL, { useCreateIndex: true, useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true })
   .then(() => {
     console.log(`Database on ${DATABASE_URL}`)
-    new CronJob('0 0 * * * *', () => { // eslint-disable-line no-new
-      cronjob() // Every hour, it has 6 dots, with 1 second as the finest granularity
-    }, null, true, 'America/Los_Angeles')
+    new CronJob('0 0 * * * *', () => cronjob(), null, true, 'America/Los_Angeles') // eslint-disable-line no-new
   })
   .then(() => app.listen(PORT, () => {
     console.log(`Listening on ${PORT}`)

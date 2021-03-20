@@ -1,9 +1,8 @@
 # History Sync for Spotify
 
-[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/GitHub%20Pages/badge.svg)](https://github.com/LuisEnMarroquin)
-[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Self%20Hosted/badge.svg)](https://github.com/LuisEnMarroquin)
-[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Nginx%20Proxy/badge.svg)](https://github.com/LuisEnMarroquin)
-[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/workflows/Backup%20Mongo/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/backup.yml/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/deploy.yml/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/server.yml/badge.svg)](https://github.com/LuisEnMarroquin)
 
 Sync your Spotify's playback history every hour
 
@@ -45,12 +44,12 @@ CLIENT_SECRET=12345678
 If you have Docker you can run
 
 ```shell
-npm run database
+docker volume create mongo
+docker volume create mongoc
+docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2
 ```
 
 ## Run the application
-
-In order to run the project, run `server.js`
 
 ```shell
 node server.js

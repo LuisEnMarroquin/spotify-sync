@@ -1,0 +1,51 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  github:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install NPM dependencies
+      run: npm ci --omit=dev --omit=optional
+    - name: Compile and minify TypeScript
+      run: npm run compile
+    - name: Copy CNAME to set custom URL
+      run: cp CNAME public/CNAME
+    - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
+      with:
+        FOLDER: public
+        SSHKEY: ${{ secrets.SSH_GITHUB }}
+  server:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to Docker Hub
+      run: docker login -u luisenmarroquin -p ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build Docker image
+      run: docker build --tag luisenmarroquin/spotify-sync:latest .
+    - name: Push Docker image
+      run: docker push luisenmarroquin/spotify-sync:latest
+    - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
+      with:
+        ORIGIN: spotify.marroquin.dev
+        SSHKEY: ${{ secrets.SSH_SERVER }}
+        NAME: production
+        PORT: ${{ secrets.SSH_PORT }}
+        USER: ${{ secrets.SSH_USER }}
+    - name: Delete folder and recreate
+      run: ssh production 'rm -rf /opt/.github/spotify && mkdir -p /opt/.github/spotify'
+    - name: Create env file with secret variables
+      run: sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
+    - name: Send files over ssh with scp
+      run: scp .env compose.yml production:/opt/.github/spotify
+    - name: Pull all images from Docker Hub
+      run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
+    - name: Deploy project in remove server
+      run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml --project-name spotify up -d --remove-orphans'
+    - name: Delete files from remote server
+      run: ssh production rm -rf /opt/.github/spotify

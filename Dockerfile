@@ -11,13 +11,13 @@ WORKDIR /opt/app/
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci --omit=dev --omit=optional
+RUN npm ci --omit=optional
 
 # Copy all files
 COPY . ./
 
 # Compile TypeScript
-RUN npm run compile
+RUN npm run frontend
 
 # This folder is not longed needed
 RUN rm -rf src/

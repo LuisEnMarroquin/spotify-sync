@@ -1,10 +1,10 @@
 import { compile } from "handlebars"
 
-let baseURL:string = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? '' : 'https://spotify.marroquin.dev'
+let baseURL: string = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? '' : 'https://spotify.marroquin.dev'
 
 document.getElementById('login-button').addEventListener('click', () => window.location.href = `${baseURL}/login`, false)
 
-let pagination:number = 1, navigation:number = 1
+let pagination: number = 1, navigation: number = 1
 
 let userProfile1 = compile(document.getElementById('perfil-template').innerHTML)
 let userProfile2 = document.getElementById('perfil')
@@ -28,7 +28,7 @@ let logout = () => { // Logs out removing token from url
   $('#loggedin').hide()
 }
 
-function getHistory(page:number) {
+function getHistory(page: number) {
   $.ajax({
     url: `${baseURL}/my_history`,
     data: { page, access_token: params.access_token }
@@ -72,7 +72,7 @@ interface iParams {
   access_token?: string;
 }
 
-let params:iParams = getHashParams()
+let params: iParams = getHashParams()
 
 if (params.error) alert('There was an error during the authentication')
 else {
@@ -116,7 +116,7 @@ else {
     logout()
   }, false)
 
-  $('.nav-item').on('click', function() { // DON'T CHANGE TO ARROW FUNCTION, 'this' keyword inside won't work
+  $('.nav-item').on('click', function () { // DON'T CHANGE TO ARROW FUNCTION, 'this' keyword inside won't work
     $('.navbar-collapse').collapse('hide') // Close navbar on option select
     $('.nav-link').removeClass('active') // Remove active class from all
     $(this).children().addClass('active') // Add active class to clicked
