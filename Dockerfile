@@ -30,14 +30,14 @@ RUN npm run server
 # Production environment
 FROM node:lts-alpine
 
-# Copy files from build environment
-COPY --from=build-env /opt/app/dist .
-
 # Show all node logs
 ENV NPM_CONFIG_LOGLEVEL warn
 
 # Set working directory
 WORKDIR /opt/app/
+
+# Copy files from build environment
+COPY --from=build-env /opt/app/dist .
 
 # Show all files
 RUN ls -aR

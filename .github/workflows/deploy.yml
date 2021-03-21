@@ -6,19 +6,19 @@ on:
     - main
 
 jobs:
-  github:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build files for GitHub Pages
-      run: |
-        npm ci --no-optional
-        npm run browser
-        cp CNAME public/CNAME
-    - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
-      with:
-        FOLDER: public
-        SSHKEY: ${{ secrets.SSH_GITHUB }}
+  # github:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Build files for GitHub Pages
+  #     run: |
+  #       npm ci --no-optional
+  #       npm run browser
+  #       cp CNAME public/CNAME
+  #   - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
+  #     with:
+  #       FOLDER: public
+  #       SSHKEY: ${{ secrets.SSH_GITHUB }}
   server:
     runs-on: ubuntu-latest
     steps:
