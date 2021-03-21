@@ -14,7 +14,12 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-optional
 
 # Copy all files
-COPY tsconfig.json src/ public/ ./
+COPY tsconfig.json ./
+COPY src/ ./src/
+COPY public/ ./public/
+
+# Show files
+RUN ls
 
 # Compile frontend
 RUN npm run browser

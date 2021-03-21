@@ -1,7 +1,7 @@
 # History Sync for Spotify
 
-[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/backup.yml/badge.svg)](https://github.com/LuisEnMarroquin)
 [![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/deploy.yml/badge.svg)](https://github.com/LuisEnMarroquin)
+[![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/backup.yml/badge.svg)](https://github.com/LuisEnMarroquin)
 [![Fail](https://github.com/LuisEnMarroquin/spotify-sync/actions/workflows/server.yml/badge.svg)](https://github.com/LuisEnMarroquin)
 
 Sync your Spotify's playback history every hour
