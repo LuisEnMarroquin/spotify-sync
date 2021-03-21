@@ -6,19 +6,19 @@ on:
     - main
 
 jobs:
-  # github:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Build files for GitHub Pages
-  #     run: |
-  #       npm ci --no-optional
-  #       npm run browser
-  #       cp CNAME public/CNAME
-  #   - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
-  #     with:
-  #       FOLDER: public
-  #       SSHKEY: ${{ secrets.SSH_GITHUB }}
+  github:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build files for GitHub Pages
+      run: |
+        npm ci --no-optional
+        npm run browser
+        cp CNAME public/CNAME
+    - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
+      with:
+        FOLDER: public
+        SSHKEY: ${{ secrets.SSH_GITHUB }}
   server:
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +40,7 @@ jobs:
         ssh production 'rm -rf /opt/.github/spotify && mkdir -p /opt/.github/spotify'
         sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
         scp .env compose.yml production:/opt/.github/spotify
-    - name: Deploy project in remote server
+    - name: Deploy project to remote server
       run: |
         ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
         ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml -p spotify up -d --remove-orphans'

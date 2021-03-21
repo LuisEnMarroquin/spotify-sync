@@ -1,9 +1,6 @@
 # Build environment
 FROM node:lts-alpine AS build-env
 
-# Show all node logs
-ENV NPM_CONFIG_LOGLEVEL warn
-
 # Set working directory
 WORKDIR /opt/app/
 
@@ -18,20 +15,17 @@ COPY tsconfig.json ./
 COPY src/ ./src/
 COPY public/ ./public/
 
-# Show files
-RUN ls
-
 # Compile frontend
 RUN npm run browser
 
 # Compile backend
 RUN npm run server
 
+# This file gets modified by ncc
+RUN cp public/scripts.js dist/public/scripts.js
+
 # Production environment
 FROM node:lts-alpine
-
-# Show all node logs
-ENV NPM_CONFIG_LOGLEVEL warn
 
 # Set working directory
 WORKDIR /opt/app/
