@@ -4,10 +4,10 @@
   "description": "Sync your Spotify's playback history every hour",
   "private": true,
   "scripts": {
-    "start": "tsl dev src/server.ts 'npm run client'",
-    "client": "tsl client src/scripts.ts public",
-    "server2": "tsl client src/server.ts dist",
-    "server": "tsl server src/server.ts dist"
+    "start": "tsl dev src/server.ts 'npm run browser'",
+    "browser": "tsl browser src/scripts.ts public",
+    "server": "tsl build src/server.ts dist",
+    "run": "tsl run src/server.ts"
   },
   "dependencies": {
     "compression": "^1.7.4",
@@ -27,7 +27,8 @@
     "@types/cors": "^2.8.10",
     "@types/cron": "^1.7.2",
     "@types/jquery": "^3.5.5",
-    "@types/request": "^2.48.5"
+    "@types/request": "^2.48.5",
+    "ts-land": "^1.0.0"
   },
   "nodemonConfig": {
     "ext": "html,css,js,ts,json",

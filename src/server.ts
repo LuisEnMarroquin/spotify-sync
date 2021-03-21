@@ -6,7 +6,6 @@ import { CronJob } from 'cron'
 import express from 'express'
 import request from 'request'
 import { join } from 'path'
-import PORT from './port'
 import cors from 'cors'
 
 require('dotenv').config()
@@ -23,6 +22,7 @@ let Users = model('Users', new Schema({}, { strict: false, versionKey: false, ti
 let Tracks = model('Tracks', new Schema({}, { strict: false, versionKey: false, timestamps: true }))
 
 // Spotify Dashboard variables
+let PORT = 8888
 let stateKey = 'spotify_auth_state'
 let redirUri = process.env.API_HOST || `http://localhost:${PORT}/callback`
 let buffAuth = (Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64'))

@@ -1,5 +1,5 @@
-# NodeJS Alpine
-FROM node:lts-alpine
+# Build environment
+FROM node:lts-alpine AS build-env
 
 # Show all node logs
 ENV NPM_CONFIG_LOGLEVEL warn
@@ -11,16 +11,31 @@ WORKDIR /opt/app/
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci --omit=optional
+RUN npm ci --no-optional
 
 # Copy all files
-COPY . ./
+COPY tsconfig.json src/ public/ ./
 
-# Compile TypeScript
-RUN npm run frontend
+# Compile frontend
+RUN npm run browser
 
-# This folder is not longed needed
-RUN rm -rf src/
+# Compile backend
+RUN npm run server
+
+# Production environment
+FROM node:lts-alpine
+
+# Copy files from build environment
+COPY --from=build-env /opt/app/dist .
+
+# Show all node logs
+ENV NPM_CONFIG_LOGLEVEL warn
+
+# Set working directory
+WORKDIR /opt/app/
+
+# Show all files
+RUN ls -aR
 
 # Run the application
-CMD [ "node", "server.js" ]
+CMD [ "node", "index.js" ]

@@ -17,13 +17,12 @@ jobs:
         NAME: production
         PORT: ${{ secrets.SSH_PORT }}
         USER: ${{ secrets.SSH_USER }}
-    - name: Delete folder and recreate
-      run: ssh production 'rm -rf /opt/.github/proxy && mkdir -p /opt/.github/proxy'
-    - name: Send files over ssh with scp
-      run: scp compose-nginx.yml production:/opt/.github/proxy
-    - name: Pull all images from Docker Hub
-      run: ssh production 'cd /opt/.github/proxy && docker-compose -f compose-nginx.yml pull'
-    - name: Deploy project to remote server
-      run: ssh production 'cd /opt/.github/proxy && docker-compose -f compose-nginx.yml --project-name proxy up -d --remove-orphans'
-    - name: Delete files from remote server
-      run: ssh production rm -rf /opt/.github/proxy
+    - name: Set workplace in remote server
+      run: |
+        ssh production 'rm -rf /opt/.github/proxy && mkdir -p /opt/.github/proxy'
+        scp compose-nginx.yml production:/opt/.github/proxy
+    - name: Deploy project in remote server
+      run: |
+        ssh production 'cd /opt/.github/proxy && docker-compose -f compose-nginx.yml pull'
+        ssh production 'cd /opt/.github/proxy && docker-compose -f compose-nginx.yml -p proxy up -d --remove-orphans'
+        ssh production 'rm -rf /opt/.github/proxy'

@@ -12,8 +12,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build files for GitHub Pages
       run: |
-        npm ci --omit=dev --omit=optional
-        npm run compile
+        npm ci --no-optional
+        npm run browser
         cp CNAME public/CNAME
     - uses: LuisEnMarroquin/gh-pages-publish@v2.4.4
       with:
@@ -35,15 +35,13 @@ jobs:
         NAME: production
         PORT: ${{ secrets.SSH_PORT }}
         USER: ${{ secrets.SSH_USER }}
-    - name: Delete folder and recreate
-      run: ssh production 'rm -rf /opt/.github/spotify && mkdir -p /opt/.github/spotify'
-    - name: Create env file with secret variables
-      run: sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
-    - name: Send files over ssh with scp
-      run: scp .env compose.yml production:/opt/.github/spotify
-    - name: Pull all images from Docker Hub
-      run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
-    - name: Deploy project in remove server
-      run: ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml --project-name spotify up -d --remove-orphans'
-    - name: Delete files from remote server
-      run: ssh production rm -rf /opt/.github/spotify
+    - name: Set workplace in remote server
+      run: |
+        ssh production 'rm -rf /opt/.github/spotify && mkdir -p /opt/.github/spotify'
+        sh dotenv.sh ${{ secrets.CLIENT_ID }} ${{ secrets.CLIENT_SECRET }} ${{ secrets.ME_USERNAME }} ${{ secrets.ME_PASSWORD }} ${{ secrets.ME_SESSION }} ${{ secrets.ME_COOKIE }}
+        scp .env compose.yml production:/opt/.github/spotify
+    - name: Deploy project in remote server
+      run: |
+        ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml pull'
+        ssh production 'cd /opt/.github/spotify && docker-compose -f compose.yml -p spotify up -d --remove-orphans'
+        ssh production 'rm -rf /opt/.github/spotify'
