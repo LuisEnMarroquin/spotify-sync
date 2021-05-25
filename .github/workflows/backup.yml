@@ -44,7 +44,9 @@ jobs:
     - name: Copy backup files to repo
       working-directory: spotify-repo
       run: |
-        cp -a ./${{ env.backDir }}/${{ env.mongoDB }}/. ./
+        cd .. && ls
+        cp -a ../${{ env.backDir }}/${{ env.mongoDB }}/. ./
+        ls
         git add .
         git commit --allow-empty -m "Backup at $(date)"
         git push -u origin master
