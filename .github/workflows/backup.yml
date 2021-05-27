@@ -1,6 +1,9 @@
 name: Backup Mongo
 
 on:
+  push:
+    branches:
+    - main
   schedule: # Minute Hour DayOfMonth MonthOfYear DayOfWeek
     - cron: '0 10 * * *' # Greenwich time: Will run every day at 4 am Mexico City time
 
