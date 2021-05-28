@@ -13,6 +13,7 @@ jobs:
     env:
       mongoDB: spotify
       backDir: backup-folder
+      repoDir: spotify-repo
     steps:
     - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
       with:
@@ -43,13 +44,12 @@ jobs:
         ssh -T git@gitlab.com || true
         git config --global user.name "LuisEnMarroquin"
         git config --global user.email "mluis651@gmail.com"
-        git clone --depth 1 git@gitlab.com:LuisEnMarroquin/spotify-sync.git spotify-repo
+        git clone --depth 1 git@gitlab.com:LuisEnMarroquin/spotify-sync.git ${{ env.repoDir }}
     - name: Copy backup files to repo
-      working-directory: spotify-repo
       run: |
-        cd .. && ls
-        cp -a ../${{ env.backDir }}/${{ env.mongoDB }}/. ./
-        ls
-        git add .
-        git commit --allow-empty -m "Backup at $(date)"
-        git push -u origin master
+        ls -aR
+        cp -a ./${{ env.backDir }}/${{ env.mongoDB }}/. ./${{ env.repoDir }}
+        ls -aR
+        # git add .
+        # git commit --allow-empty -m "Backup at $(date)"
+        # git push -u origin master
