@@ -45,8 +45,10 @@ jobs:
         git config --global user.email "mluis651@gmail.com"
         git clone --depth 1 git@gitlab.com:LuisEnMarroquin/backups.git ${{ env.repoDir }}
     - name: Copy backup files to repo
+      working-directory: ${{ env.repoDir }}
       run: |
-        cp -a ./${{ env.backDir }}/. ./${{ env.repoDir }}
-        git add .
-        git commit --allow-empty -m "Backup at $(date)"
-        git push -u origin master
+        cp -a ../${{ env.backDir }}/. .
+        ls -aR
+        # git add .
+        # git commit --allow-empty -m "Backup at $(date)"
+        # git push -u origin master
