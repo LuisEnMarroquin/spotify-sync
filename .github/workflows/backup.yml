@@ -1,6 +1,9 @@
 name: Backup Mongo
 
 on:
+  push:
+    branches:
+    - main
   schedule: # Minute Hour DayOfMonth MonthOfYear DayOfWeek
     - cron: '0 10 * * *' # Greenwich time: Will run every day at 4 am Mexico City time
 
@@ -8,8 +11,8 @@ jobs:
   cronjob:
     runs-on: ubuntu-latest
     env:
-      mongoDB: spotify
       backDir: backup-folder
+      repoDir: backup-repository
     steps:
     - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
       with:
@@ -20,7 +23,7 @@ jobs:
         USER: ${{ secrets.SSH_USER }}
     - name: Dumping database with mongodump gzip and compressing with tar.gz
       run: |
-        ssh production docker exec -t spotify_mongo mongodump --gzip -d ${{ env.mongoDB }} -o ${{ env.backDir }}
+        ssh production docker exec -t spotify_mongo mongodump --gzip -o ${{ env.backDir }}
         ssh production docker exec -t spotify_mongo tar -czvf spotify-mongo.tar.gz ${{ env.backDir }}
     - name: Moving tar.gz from container to server
       run: |
@@ -40,11 +43,11 @@ jobs:
         ssh -T git@gitlab.com || true
         git config --global user.name "LuisEnMarroquin"
         git config --global user.email "mluis651@gmail.com"
-        git clone --depth 1 git@gitlab.com:LuisEnMarroquin/spotify-sync.git spotify-repo
+        git clone --depth 1 git@gitlab.com:LuisEnMarroquin/backups.git ${{ env.repoDir }}
     - name: Copy backup files to repo
-      working-directory: spotify-repo
+      working-directory: ${{ env.repoDir }}
       run: |
-        cp -a ./${{ env.backDir }}/${{ env.mongoDB }}/. ./
+        cp -a ../${{ env.backDir }}/. .
         git add .
         git commit --allow-empty -m "Backup at $(date)"
         git push -u origin master

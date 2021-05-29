@@ -5,10 +5,12 @@ import { randomBytes } from 'crypto'
 import { CronJob } from 'cron'
 import express from 'express'
 import request from 'request'
+import dotenv from 'dotenv'
 import { join } from 'path'
 import cors from 'cors'
 
-require('dotenv').config()
+dotenv.config()
+
 let { connect, model, Schema } = require('mongoose')
 let app = express()
 

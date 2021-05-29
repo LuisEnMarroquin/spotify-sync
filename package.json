@@ -1,27 +1,23 @@
 {
-  "name": "spotify-sync",
-  "author": "LuisEnMarroquin <luis@marroquin.dev>",
-  "description": "Sync your Spotify's playback history every hour",
   "private": true,
   "scripts": {
-    "start": "tsl dev src/server.ts 'npm run browser'",
-    "browser": "tsl browser src/scripts.ts public",
-    "server": "tsl build src/server.ts dist",
-    "run": "tsl run src/server.ts"
+    "start": "tsl dev src/server.ts 'npm run build-app'",
+    "build-app": "tsl browser src/scripts.ts public",
+    "build-api": "tsl build src/server.ts build"
   },
   "dependencies": {
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.4",
     "cron": "^1.8.2",
-    "dotenv": "^8.1.0",
+    "dotenv": "^10.0.0",
     "express": "^4.16.0",
     "handlebars": "^4.7.7",
-    "mongoose": "^5.11.17",
+    "mongoose": "^5.12.12",
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "@types/bootstrap": "^5.0.9",
+    "@types/bootstrap": "^5.0.15",
     "@types/compression": "^1.7.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.10",
@@ -31,9 +27,9 @@
     "ts-land": "^1.0.0"
   },
   "nodemonConfig": {
-    "ext": "html,css,js,ts,json",
+    "ext": "html,css,ts,json",
     "ignore": [
-      "dist/",
+      "build/",
       "public/*.js"
     ]
   }

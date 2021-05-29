@@ -48,11 +48,3 @@ docker volume create mongo
 docker volume create mongoc
 docker run -d --name mongo -p 27017:27017 -v mongo:/data/db -v mongoc:/data/configdb mongo:4.2
 ```
-
-## Run the application
-
-```shell
-node server.js
-```
-
-Then, open `http://localhost:8888` in your browser
