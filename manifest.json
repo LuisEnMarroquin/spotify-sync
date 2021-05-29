@@ -1,6 +1,6 @@
 {
-  "name": "Spotify Listening History",
-  "short_name": "spotify-sync",
+  "name": "Spotify Sync",
+  "short_name": "Spotify Sync",
   "display": "standalone",
   "theme_color": "#1DB954",
   "background_color": "#FFF",
