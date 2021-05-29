@@ -48,7 +48,6 @@ jobs:
       working-directory: ${{ env.repoDir }}
       run: |
         cp -a ../${{ env.backDir }}/. .
-        ls -aR
-        # git add .
-        # git commit --allow-empty -m "Backup at $(date)"
-        # git push -u origin master
+        git add .
+        git commit --allow-empty -m "Backup at $(date)"
+        git push -u origin master
