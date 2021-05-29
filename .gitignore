@@ -1,4 +1,4 @@
-# File managers
+# Files
 .DS_Store
 .directory
 desktop.ini
@@ -9,12 +9,10 @@ node_modules/
 # Logs
 *.log*
 
-# Env file
-.env
-
-# Built js
-dist/
-public/*.js
-
-# Test files
+# Notes
 nothing.*
+
+# Production
+.env
+build/
+public/*.js

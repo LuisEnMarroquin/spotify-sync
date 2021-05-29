@@ -11,9 +11,8 @@ jobs:
   cronjob:
     runs-on: ubuntu-latest
     env:
-      mongoDB: spotify
       backDir: backup-folder
-      repoDir: spotify-repo
+      repoDir: backup-repository
     steps:
     - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
       with:
@@ -24,7 +23,7 @@ jobs:
         USER: ${{ secrets.SSH_USER }}
     - name: Dumping database with mongodump gzip and compressing with tar.gz
       run: |
-        ssh production docker exec -t spotify_mongo mongodump --gzip -d ${{ env.mongoDB }} -o ${{ env.backDir }}
+        ssh production docker exec -t spotify_mongo mongodump --gzip -o ${{ env.backDir }}
         ssh production docker exec -t spotify_mongo tar -czvf spotify-mongo.tar.gz ${{ env.backDir }}
     - name: Moving tar.gz from container to server
       run: |
@@ -44,12 +43,10 @@ jobs:
         ssh -T git@gitlab.com || true
         git config --global user.name "LuisEnMarroquin"
         git config --global user.email "mluis651@gmail.com"
-        git clone --depth 1 git@gitlab.com:LuisEnMarroquin/spotify-sync.git ${{ env.repoDir }}
+        git clone --depth 1 git@gitlab.com:LuisEnMarroquin/backups.git ${{ env.repoDir }}
     - name: Copy backup files to repo
       run: |
-        ls -aR
-        cp -a ./${{ env.backDir }}/${{ env.mongoDB }}/. ./${{ env.repoDir }}
-        ls -aR
-        # git add .
-        # git commit --allow-empty -m "Backup at $(date)"
-        # git push -u origin master
+        cp -a ./${{ env.backDir }}/. ./${{ env.repoDir }}
+        git add .
+        git commit --allow-empty -m "Backup at $(date)"
+        git push -u origin master
